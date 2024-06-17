@@ -1,0 +1,5 @@
+_download:
+7zip
+
+
+compile: node src -c Project
