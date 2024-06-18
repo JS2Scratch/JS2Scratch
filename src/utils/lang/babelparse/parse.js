@@ -38,17 +38,13 @@ module.exports = ((input, filename, preParsed = false) => {
 
     const convertToScratch = (path, node) => {
 
-        if (node.type === "IfStatement")
-        {
-            console.log(node)
-        }
-
         if (skip <= 0) {
+            if (!preParsed) console.log(node.type)
             let isLastNode = index + 1 === ast.program.body.length - 1;
             let filePath = join(__dirname, "gen", node.type + ".js")
 
             if (existsSync(filePath)) {
-                let module = require(filePath)(node, index, isLastNode, ast)
+                let module = require(filePath)(node, index, isLastNode, ast, filename)
 
                 if (module.Code) {
                     let key
@@ -95,7 +91,7 @@ module.exports = ((input, filename, preParsed = false) => {
             if (!allowedModes.includes(commentName)) {
                 console.warn(
                     error.warn(
-                        `Could not find comment directive, '${commentName}'. This will be ignored.`
+                        `${filename}: Could not find comment directive, '${commentName}'. This will be ignored.`
                     )
                 )
             } else {
@@ -130,7 +126,7 @@ module.exports = ((input, filename, preParsed = false) => {
             {
                 console.warn(
                     error.warn(
-                        `Unused variable, '${unusedVariables[i]}'.`
+                        `${filename}: Unused variable, '${unusedVariables[i]}'.`
                     )
                 )
             }
@@ -142,5 +138,5 @@ module.exports = ((input, filename, preParsed = false) => {
         directiveFunctions[modes[i]]()
     }
 
-    return [code, variables]
+    return [code, variables, index]
 })

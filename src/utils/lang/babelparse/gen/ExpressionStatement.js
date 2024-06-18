@@ -1,11 +1,12 @@
 const block = require("../../../scratch/block")
+const error = require("../util/error")
 const parseExpression = require('../util/parseExpression')
 
 let libs = {
     "console": {
-        "log": ((args, index) => {
+        "log": ((args, index, fn) => {
 
-            const { blocks, reference } = parseExpression(args[0], index)
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -34,8 +35,8 @@ let libs = {
             ]
         }),
 
-        "error": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "error": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -59,8 +60,8 @@ let libs = {
     },
 
     "motion": {
-        "movesteps": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "movesteps": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -82,8 +83,8 @@ let libs = {
             ]
         }),
 
-        "turnright": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "turnright": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -105,8 +106,8 @@ let libs = {
             ]
         }),
 
-        "turnleft": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "turnleft": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -128,9 +129,9 @@ let libs = {
             ]
         }),
 
-        "goto": ((args, index) => {
-            const { blocks: leftBlocks, reference: leftReference } = parseExpression(args[0], index);
-            const { blocks: rightBlocks, reference: rightReference } = parseExpression(args[1], index);
+        "goto": ((args, index, fn) => {
+            const { blocks: leftBlocks, reference: leftReference } = parseExpression(args[0], index, fn);
+            const { blocks: rightBlocks, reference: rightReference } = parseExpression(args[1], index, fn);
 
             return [
                 block.createBlock(
@@ -153,11 +154,11 @@ let libs = {
             ]
         }),
 
-        "tween": ((args, index) => {
+        "tween": ((args, index, fn) => {
 
-            const { blocks: timeBlocks, reference: timeReference } = parseExpression(args[0], index);
-            const { blocks: leftBlocks, reference: leftReference } = parseExpression(args[1], index);
-            const { blocks: rightBlocks, reference: rightReference } = parseExpression(args[2], index);
+            const { blocks: timeBlocks, reference: timeReference } = parseExpression(args[0], index, fn);
+            const { blocks: leftBlocks, reference: leftReference } = parseExpression(args[1], index, fn);
+            const { blocks: rightBlocks, reference: rightReference } = parseExpression(args[2], index, fn);
 
             return [
                 block.createBlock(
@@ -182,8 +183,8 @@ let libs = {
             ]
         }),
 
-        "point": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "point": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -206,8 +207,8 @@ let libs = {
         }),
 
         
-        "changeX": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "changeX": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -229,8 +230,8 @@ let libs = {
             ]
         }),
 
-        "changeY": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "changeY": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -252,8 +253,8 @@ let libs = {
             ]
         }),
 
-        "setX": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "setX": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -275,8 +276,8 @@ let libs = {
             ]
         }),
 
-        "setY": ((args, index) => {
-            const { blocks, reference } = parseExpression(args[0], index)
+        "setY": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
 
             return [
                 block.createBlock(
@@ -316,10 +317,35 @@ let libs = {
 
             ]
         })
+    },
+
+    "control": {
+        "wait": ((args, index, fn) => {
+            const { blocks, reference } = parseExpression(args[0], index, fn)
+
+            return [
+                block.createBlock(
+                    block.enum.control.Wait,
+                    null,
+                    null,
+                    {
+                        "DURATION": reference,
+                    },
+                    {},
+                    false,
+                    false,
+                    0,
+                    0
+                ),
+
+                blocks
+
+            ]
+        })
     }
 }
 
-module.exports = ((node, index, isLast, ast) => {
+module.exports = ((node, index, isLast, ast, filename) => {
 
     let calleeObject = node.expression.callee
     let libName = calleeObject.object.name
@@ -327,7 +353,15 @@ module.exports = ((node, index, isLast, ast) => {
 
     let arguments = node.expression.arguments
 
-    let blockData = libs[libName || "console"][funcName || "log"](arguments, index)
+    if (!libs[libName] || !libs[libName][funcName])
+    {
+        return error.throw(
+            error.enum.InvalidArguments,
+            `${filename}: Unknown library / function, got: '${libName}.${funcName}'`
+        )
+    }
+
+    let blockData = libs[libName || "console"][funcName || "log"](arguments, index, filename)
 
     return {
         Code: blockData[0],

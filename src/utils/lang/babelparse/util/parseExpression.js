@@ -18,18 +18,18 @@ const operatorMap = {
     '||': 'operator_or'
 };
 
-const parseExpression = (expr, parentIndex = null) => {
+const parseExpression = (expr, parentIndex = null, filename) => {
     if (!expr) {
         errors.throw(
             errors.enum.Null,
             errors.bug(
-                `No expression was given to the expression handler.`
-            ) + chalk.red(chalk.bold(`\n\nDebug Info: `)) + `Line: ${chalk.bold(chalk.blue(expr.loc.start.line))}\tColumn: ${chalk.bold(chalk.blue(expr.loc.start.column))}`
+                `${filename || "Unknown"}: No expression was given to the expression handler. No debug information can be provided. You most likely checked for a value in a control statement, like: "if (x) {". If this is the case, it must be an expression, such as "x > 3".`
+            ) 
         )
     }
 
     if (expr.type === 'BinaryExpression' || expr.type === 'LogicalExpression') {
-        let operatorBlockId = generateUUID(); // Generate UUID for operator block
+        let operatorBlockId = generateUUID();
 
         const leftOperand = parseExpression(expr.left, operatorBlockId);
         const rightOperand = parseExpression(expr.right, operatorBlockId);
@@ -40,21 +40,20 @@ const parseExpression = (expr, parentIndex = null) => {
             errors.throw(
                 errors.enum.Unsupported,
                 errors.bug(
-                    `Unsupported operator: "${expr.operator}".`
+                    `${filename}: Unsupported operator: "${expr.operator}".`
                 ) + chalk.red(chalk.bold(`\n\nDebug Info: `)) + `Line: ${chalk.bold(chalk.blue(expr.loc.start.line))}\tColumn: ${chalk.bold(chalk.blue(expr.loc.start.column))}`
             );
         }
 
-        // Handle logical operators: &&, ||, !
         if (expr.type === 'LogicalExpression') {
             operatorOpcode = operatorMap[expr.operator];
-            operatorBlockId = generateUUID(); // Generate new UUID for logical block
+            operatorBlockId = generateUUID();
 
             if (leftOperand.reference[0] !== 3 || rightOperand.reference[0] !== 3)
             {
                 errors.throw(
                     errors.enum.InvalidArguments,
-                    `Invalid Arguments (NOT a block, such as OR, NOT, or AND) were found in a logical expression. Scratch does not allow this (e.g 5 or 3)` + chalk.red(chalk.bold(`\n\nDebug Info: `)) + `Line: ${chalk.bold(chalk.blue(expr.loc.start.line))}\tColumn: ${chalk.bold(chalk.blue(expr.loc.start.column))}`
+                    `${filename}: Invalid Arguments (NOT a block, such as OR, NOT, or AND) were found in a logical expression. Scratch does not allow this (e.g 5 or 3)` + chalk.red(chalk.bold(`\n\nDebug Info: `)) + `Line: ${chalk.bold(chalk.blue(expr.loc.start.line))}\tColumn: ${chalk.bold(chalk.blue(expr.loc.start.column))}`
                 );
             }
 
@@ -91,13 +90,12 @@ const parseExpression = (expr, parentIndex = null) => {
             };
         }
 
-        // Handle binary operators: <, >, ==, ===, !=, !==
         if (expr.operator === '!=' || expr.operator === '!==') {
-            // Map "!=" and "!==" to "not equal" (wrapped in a "not" block)
+        
             operatorOpcode = 'operator_not';
-            operatorBlockId = generateUUID(); // Generate new UUID for not block
+            operatorBlockId = generateUUID(); 
 
-            const equalOperatorBlockId = generateUUID(); // Generate UUID for equal operator block
+            const equalOperatorBlockId = generateUUID(); 
             const equalOperatorBlock = {
                 [equalOperatorBlockId]: {
                     "opcode": 'operator_equals',
@@ -149,8 +147,7 @@ const parseExpression = (expr, parentIndex = null) => {
                 ]
             };
         } else {
-            // Regular binary operators like <, >, ==, ===
-            operatorBlockId = generateUUID(); // Generate new UUID for comparison block
+            operatorBlockId = generateUUID();
 
             const operatorBlock = {
                 [operatorBlockId]: {
@@ -188,32 +185,53 @@ const parseExpression = (expr, parentIndex = null) => {
         if (expr.callee.type === 'MemberExpression' &&
             expr.callee.object.name === 'operation' &&
             expr.callee.property.name === 'join') {
-
-            const joinBlockId = generateUUID();
-            const leftOperand = parseExpression(expr.arguments[0], joinBlockId);
-            const rightOperand = parseExpression(expr.arguments[1], joinBlockId);
-
-            const joinBlock = {
-                [joinBlockId]: {
-                    "opcode": "operator_join",
-                    "next": null,
-                    "do_not_change_next": true,
-                    "parent": String(parentIndex),
-                    "inputs": {
-                        "STRING1": leftOperand.reference,
-                        "STRING2": rightOperand.reference
-                    },
-                    "fields": {},
-                    "shadow": false,
-                    "topLevel": !parentIndex
-                }
+        
+            let joinBlockId = generateUUID();
+            let leftOperand = parseExpression(expr.arguments[0], joinBlockId);
+        
+            let blocks = {
+                ...leftOperand.blocks
             };
-
-            return {
-                blocks: {
-                    ...leftOperand.blocks,
+        
+            for (let i = 1; i < expr.arguments.length; i++) {
+                let rightOperand = parseExpression(expr.arguments[i], joinBlockId);
+                const newJoinBlockId = generateUUID();
+        
+                const joinBlock = {
+                    [newJoinBlockId]: {
+                        "opcode": "operator_join",
+                        "next": null,
+                        "do_not_change_next": true,
+                        "parent": String(parentIndex),
+                        "inputs": {
+                            "STRING1": (i === 1) ? leftOperand.reference : [
+                                3,
+                                joinBlockId,
+                                [
+                                    4,
+                                    ""
+                                ]
+                            ],
+                            "STRING2": rightOperand.reference
+                        },
+                        "fields": {},
+                        "shadow": false,
+                        "topLevel": !parentIndex
+                    }
+                };
+        
+                blocks = {
+                    ...blocks,
                     ...rightOperand.blocks,
                     ...joinBlock
+                };
+        
+                joinBlockId = newJoinBlockId;
+            }
+        
+            return {
+                blocks: {
+                    ...blocks
                 },
                 reference: [
                     3,
@@ -228,7 +246,7 @@ const parseExpression = (expr, parentIndex = null) => {
             errors.throw(
                 errors.enum.Unsupported,
                 errors.bug(
-                    `Unsupported CallExpression: "${expr.callee.object.name}.${expr.callee.property.name}".`
+                    `${filename}: Unsupported CallExpression: "${expr.callee.object.name}.${expr.callee.property.name}".`
                 ) + chalk.red(chalk.bold(`\n\nDebug Info: `)) + `Line: ${chalk.bold(chalk.blue(expr.loc.start.line))}\tColumn: ${chalk.bold(chalk.blue(expr.loc.start.column))}`
             );
         }
@@ -305,7 +323,7 @@ const parseExpression = (expr, parentIndex = null) => {
         errors.throw(
             errors.enum.Unsupported,
             errors.bug(
-                `Unable to parse expression of type, "${expr.type}".`
+                `${filename}: Unable to parse expression of type, "${expr.type}".`
             ) + chalk.red(chalk.bold(`\n\nDebug Info: `)) + `Line: ${chalk.bold(chalk.blue(expr.loc.start.line))}\tColumn: ${chalk.bold(chalk.blue(expr.loc.start.column))}`
         );
     }

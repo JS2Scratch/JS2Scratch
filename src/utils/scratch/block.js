@@ -31,6 +31,11 @@ module.exports = {
             GreenFlag: "event_whenflagclicked"
         },
 
+        control: {
+            Wait: "control_wait",
+            If: "control_if"
+        },
+
         variable: {
             SetVariable: "data_setvariableto"
         }

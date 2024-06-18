@@ -1,8 +1,8 @@
 const block = require("../../../scratch/block")
 const parseExpression = require('../util/parseExpression')
 
-module.exports = ((node, index, isLast, ast) => {
-    const { blocks, reference } = parseExpression(node.init, index);
+module.exports = ((node, index, isLast, ast, filename) => {
+    const { blocks, reference } = parseExpression(node.init, index, filename);
 
     return {
         Code: block.createBlock(
