@@ -13,6 +13,7 @@ This repository contains everything you need to start developing with JavaScript
 
 **This project requires you to have the following tools installed:**
 - [Node](https://nodejs.org) (version >= 16)
+- [7Zip](https://www.7-zip.org/download.html)
 
 ## Setup
 
