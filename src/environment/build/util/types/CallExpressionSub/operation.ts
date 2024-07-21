@@ -25,7 +25,7 @@ function getFileData(expr: any): string {
 
 module.exports = {
     join: ((args: any, parentID: string, OriginalSource: string, fullExpr: any) => {
-        if (args.length < 1) errorMessages["Not enough arguments"](getFileData(fullExpr), "join", args.length, Number.MAX_SAFE_INTEGER)
+        if (args.length < 3) errorMessages["Not enough arguments"](getFileData(fullExpr), "join", args.length, Number.MAX_SAFE_INTEGER)
 
         let leftKey = uuid(includes.scratch_alphanumeric, 5);
         let leftOperand = evaluate(args[0], leftKey, OriginalSource);
