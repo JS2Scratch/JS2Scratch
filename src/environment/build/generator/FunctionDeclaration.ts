@@ -36,7 +36,6 @@ module.exports = ((Parameters: GenerationParams, OriginalSource: string) => {
     
     delete builtBody[Object.keys(builtBody)[0]];
 
-    console.log(builtBody)
     let startKey = Object.keys(builtBody)[0];
     builtBody[startKey].parent = Parameters.key;
 
