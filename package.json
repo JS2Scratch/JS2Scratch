@@ -1,13 +1,22 @@
 {
+  "name": "js2scratch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "ShadowX",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "ts-node": "^10.9.2"
+  },
+
   "devDependencies": {
     "@babel/cli": "^7.24.7",
     "@babel/core": "^7.24.7",
     "@babel/parser": "^7.24.7",
     "@babel/traverse": "^7.24.7",
     "@types/node": "^20.12.12"
-  },
-  "dependencies": {
-    "chalk": "^4.0.0",
-    "uuid": "^10.0.0"
   }
 }
