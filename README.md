@@ -279,3 +279,11 @@ There are additional functions that are not in native Scratch that exist:
 - Custom blocks arguments
 - No error catching
 - Medicore error messages
+- Extensions cannot be used
+
+### Plans
+- Custom block arguments
+- Error catching
+- Extensions
+- Rust-Like error messages
+- Realtime compiler as you type.
