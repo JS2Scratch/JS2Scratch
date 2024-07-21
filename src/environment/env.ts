@@ -100,6 +100,7 @@ export function start_env(arg: { [key: string]: string })
         }
 
         let blocks = {};
+        
 
         for (const file of fs.readdirSync(inputObject)) {
             let fullPath = path.join(inputObject, file);
@@ -110,9 +111,14 @@ export function start_env(arg: { [key: string]: string })
                 }
             } else {
                 let folderContents = fs.readdirSync(fullPath);
+
                 for (let i = 0; i < folderContents.length; i++) {
                     let object = path.join(fullPath, folderContents[i]);
-                    Object.assign(blocks, build.transpileFromSource(fs.readFileSync(object).toString(), object));
+
+                    let base = path.basename(fullPath).toLowerCase().split(".");
+                    if (base[1] == sprite.Type.toLowerCase() && base[0] == keyName.toLowerCase()) {
+                        Object.assign(blocks, build.transpileFromSource(fs.readFileSync(object).toString(), object));
+                    }
                 }
             }
         }
