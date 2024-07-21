@@ -22,12 +22,12 @@ This repository contains everything you need to start developing with JavaScript
 Run `npm i` in your terminal to install all dependencies.
 
 ### Building a project using the CLI
-To create a project, you can run `npm src new`, with an optional flag of "`-i`" for its location.
+To create a project, you can run `node src new`, with an optional flag of "`-i`" for its location.
 Example:
 - `node src new` (Creates it in the root folder)
 - `node src new -i C:/AmazingScratchPrograms` (`C:/AmazingScratchPrograms/Project`)
 
-To build, you can use (surprisingly) `npm src build`, which has the following flags:
+To build, you can use (surprisingly) `node src build`, which has the following flags:
 - `-i / -input string`: Input project directory.
 - `-o / -out / -output string`: Output project directory. If not provided, then `root/Out`.
 - `-t / -turbo / -turbowarp bool`: Whether to open the TurboWarp app if the user is on Windows.
