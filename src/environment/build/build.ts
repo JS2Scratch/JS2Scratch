@@ -16,7 +16,6 @@ import { BlockOpCode, ScratchBlock } from '../../class/Sprite';
 import { NodeResult } from './types/Generation';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { File } from '@babel/types'
 import { getScratchType, ScratchType } from './util/scratchType';
 
 type ParsedFunctionCall = {
@@ -109,7 +108,7 @@ function parseFunctionCall(str: string): ParsedFunctionCall {
 }
 
 export function transpileFromSource(Source: any, FileName?: string) {
-    let babelSource: File | undefined;
+    let babelSource: any;
 
     if (typeof (Source) == "string") {
         babelSource = babel.parse(Source, {
@@ -196,7 +195,9 @@ export function transpileFromSource(Source: any, FileName?: string) {
     if (!babelSource) return {};
 
     // Parser
-    let programBody = babelSource.program.body;
+
+    let programBody = babelSource.program && babelSource.program.body || babelSource.body;
+    
     let generatorFolder = join(__dirname, "generator/");
     let previousNode: ScratchBlock | null = initBlock;
     let previousNodeID = initID;
