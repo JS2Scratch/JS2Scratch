@@ -236,7 +236,7 @@ sayHelloWorld();
 
 To make a function run without screen refresh, simply add the prefix of "`turbo_`" to the start of the function name. E.g: `turbo_sayHelloWorld()`. When calling the function, you must also add this prefix.
 The function name will be compiled into (in the example provided) "sayHelloWorld" - meaning you cannot have 2 functions with the same name, even if one runs without screen refresh. Visual Example:
-```
+```js
 // myAmazingFunction.js
 
 function turbo_sayHelloWorld() {
