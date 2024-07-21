@@ -23,8 +23,8 @@ Run `npm i` in your terminal to install all dependencies.
 ### Building a project using the CLI
 To create a project, you can run `npm src new`, with an optional flag of "`-i`" for its location.
 Example:
-- `npm src new` (Creates it in the root folder)
-- `npm src new -i C:/AmazingScratchPrograms` (`C:/AmazingScratchPrograms/Project`)
+- `node src new` (Creates it in the root folder)
+- `node src new -i C:/AmazingScratchPrograms` (`C:/AmazingScratchPrograms/Project`)
 
 To build, you can use (surprisingly) `npm src build`, which has the following flags:
 - `-i / -input string`: Input project directory.
