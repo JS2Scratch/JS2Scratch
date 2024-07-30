@@ -31,7 +31,7 @@ To build, you can use (surprisingly) `node src build`, which has the following f
 - `-i / -input string`: Input project directory.
 - `-o / -out / -output string`: Output project directory. If not provided, then `root/Out`.
 - `-t / -turbo / -turbowarp bool`: Whether to open the TurboWarp app if the user is on Windows.
-
+- `-7z / -7z_path string `: Path of the executable. Defaults to "7z".
 ### Project file structure
 
 Projects have a specific file structure that needs to be met so they can be compiled. The Project structure looks like something along these lines:

@@ -27,10 +27,12 @@ let argumentsCollected = new_args([
     "-i", "-input",
     "-o", "-out", "-output",
     "-t", "-turbo", "-turbowarp",
+    "-7z", "-7z_path"
 ], [
     ["-i", "-input"],
     ["-o", "-out", "-output"],
-    ["-t", "-turbo", "-turbowarp"]
+    ["-t", "-turbo", "-turbowarp"],
+    ["-7z", "-7z_path"]
 ]);
 
 switch (subCommand) {
