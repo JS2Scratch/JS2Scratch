@@ -137,7 +137,7 @@ export function start_env(arg: { [key: string]: string })
         fs.unlinkSync(filePath);
     }
 
-    createProject(arg["-o"] != "null" && arg["-o"] || path.join(process.cwd(), 'out'), 'Project', {
+    createProject(arg["-o"] != "null" && arg["-o"] || path.join(process.cwd(), 'out', ), 'Project', {
         targets: sprites
     }, arg);
 }

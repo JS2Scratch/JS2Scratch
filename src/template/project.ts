@@ -18,7 +18,7 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 import chalk from "chalk";
 
-export function createProject(Folder: string, Name: string, {
+export function createProject(Folder: string, Name: string,  {
     targets = [],
     monitors = [],
     meta = {
@@ -77,7 +77,16 @@ export function createProject(Folder: string, Name: string, {
     let newFinalPath = path.join(Folder, Name + ".sb3");
     if (fs.existsSync(newFinalPath)) fs.rmSync(newFinalPath);
 
-    child_process.execSync(`cd ${path.join(Folder)}/ && 7z a -tzip "${path.basename(newPath)}.sb3" "${Name}/"`);
+    let path_7z: string;
+    if (arg["-7z"] == "null") 
+        {
+            path_7z = "7z";
+        } else {
+            path_7z = '"' + arg["-7z"] + '"';
+        }
+
+
+    child_process.execSync(`cd ${path.join(Folder)}\ && ${path_7z} a -tzip "${path.basename(newPath)}.sb3" "${Name}/"`);
 
     const endTime = new Date();
     const timeDifference = Number(endTime) - Number(startTime);
