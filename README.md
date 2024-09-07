@@ -34,18 +34,30 @@ To build, you can use (surprisingly) `node src build`, which has the following f
 - `-7z / -7z_path string `: Path of the executable. Defaults to "7z".
 ### Project file structure
 
-Projects have a specific file structure that needs to be met so they can be compiled. The Project structure looks like something along these lines:
+Projects have a specific file structure that needs to be met so they can be compiled. 
+
+The Project structure looks like something along these lines:
 ```
 - Project
     - project.d.json
     - Sprite1.sprite
+        - images                (needed to automatically generate the json)
+            - image.png
         - main.js
 
     - Stage.background
         - myEpicFile.js
         - myAmazingFunction.js
+        - images                (needed to automatically generate the json)
+            - image2.png
 ```
 Every project **must** contain a `project.d.json`. It contains the sprites, costumes, and sounds that you want to import. An example of a `project.d.json`:
+
+It can be created automatically with `node src auto -i C:/AmazingScratchPrograms/Project`.
+For this to work a `images` folder **must** be included in the directory of the sprite/background.
+All of the .pngs in that directory will be included in the automatically generated `project.d.json` with their filenames as sprite names.
+**This deletes and replaces the old json and does not support sounds**
+
 ```json
 {
     "Sprite1": {
