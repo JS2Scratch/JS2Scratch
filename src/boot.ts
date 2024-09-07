@@ -12,7 +12,7 @@
 import { new_args } from './lib/arg'
 import { argv } from 'process'
 import { errorMessages } from './lib/console'
-import { start_env } from './environment/env'
+import { start_env, regenerate_json } from './environment/env'
 import { DirectoryBuffer, FileBuffer } from './lib/fs';
 
 let subCommand = argv[2];
@@ -36,6 +36,9 @@ let argumentsCollected = new_args([
 ]);
 
 switch (subCommand) {
+    case "auto":
+        regenerate_json(argumentsCollected);
+        break;
     case "build":
         start_env(argumentsCollected);
         break;
@@ -43,15 +46,16 @@ switch (subCommand) {
     case "new":
         let newDir = new DirectoryBuffer("Project");
         let spriteDir = new DirectoryBuffer("Sprite1.sprite");
+        let spritImgeDir = new DirectoryBuffer("images");
         let spriteMain = new FileBuffer("main.js", "");
+        spriteDir.Append([spriteMain,spritImgeDir]);
         let projectJson = new FileBuffer("project.d.json", `{
-    "Sprite1": {
-        "Type": "Sprite",
-        "Costumes": [],
-        "Sounds": []
-    }
-}`)
-        spriteDir.Append([spriteMain]);
+        "Sprite1": {
+            "Type": "Sprite",
+            "Costumes": [],
+             "Sounds": []
+        }}`);
+
         newDir.Append([projectJson, spriteDir]);
 
         if (argumentsCollected["-i"] == "null") argumentsCollected["-i"] = "";
