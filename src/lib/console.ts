@@ -70,6 +70,9 @@ export const errorMessages = {
     "File Structure": ((Errors: string[]) => {
         error(-6, `The following errors occured while checking the project file structure and definition file:\n\n${Errors.join("\n")}\n\nTranspilation terminated.`);
     }),
+    "How did you get here": (() => {
+        error(-7, "How did you get here. This should be impossible")
+    }),
 
 
     //
@@ -109,5 +112,5 @@ export const errorMessages = {
 
     "Attempt to call unknown function": ((File: string, Constructor: string, fnName: string) => {
         error(9, `${File}: Attempt to call unknown function: ${Constructor}.${fnName}()`)
-    }),
+    })
 };
