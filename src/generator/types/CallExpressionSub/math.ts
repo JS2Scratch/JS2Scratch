@@ -191,19 +191,6 @@ module.exports = {
         minArgs: 2,
         doParse: true,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData) => {
-            let keys = [
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-                uuid(includes.scratch_alphanumeric, 16),
-            ];
-
             let exponent = parsedArguments[1];
             let base = parsedArguments[0];
             
