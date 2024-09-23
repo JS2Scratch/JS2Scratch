@@ -21,14 +21,14 @@ import { existsSync } from "fs";
 import { join } from "path";
 
 function extractSubstringFromCode(code: string, line: number) {
-    const lines = code.split('\n');  
-    const targetLine = lines[line - 1]; 
+    const lines = code.split('\n');
+    const targetLine = lines[line - 1];
 
     return targetLine.substring(6, 21);
 }
 
 
-export function parseProgram(string: string | BlockStatement, sourceFilename: string, includeHat: boolean) {
+export function parseProgram(string: string | BlockStatement, sourceFilename: string, includeHat: boolean, packageData: { [key: string]: any }) {
     let program
     let firstIndex = ""
 
@@ -36,8 +36,7 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
         try {
             program = babel.parse(string, { sourceFilename }).program.body;
         } catch (error: any) {
-            if (error.code == "BABEL_PARSER_SYNTAX_ERROR")
-            {
+            if (error.code == "BABEL_PARSER_SYNTAX_ERROR") {
                 let errorPos: ErrorPosition = {
                     line: error.loc.line,
                     column: error.loc.column,
@@ -70,15 +69,28 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
         let fileData = join(__dirname, "../", `generator/${program[i].type}`);
         if (program[i].type == "EmptyStatement") continue;
 
-        if (!existsSync(fileData + ".ts"))
-        {
-            Warn(`No \`impl\` for '${program[i].type}'`);
-            continue;
+        let data: any;
+
+        let s = false;
+        for (let i = 0; i < packageData.implements.length; i++) {
+            if (packageData.implements[i].name == program[i].type) {
+                data = packageData.implements[i].body;
+                s = true;
+                break;
+            }
         }
 
-        let data: generatedData = require(fileData)(blockCluster, program[i], { instruction: i, originalSource: string });
+        if (!existsSync(fileData + ".ts") && !s) {
+            Warn(`No \`impl\` for '${program[i].type}'`);
+            continue;
+        } else if (!s) {
+            data = require(fileData);
+        }
+
+        data = data(blockCluster, program[i], { instruction: i, originalSource: string, packages: packageData });
+        if (!data) continue;
         if (data.err) continue;
-        
+
         let firstKey = data.keysGenerated[0];
 
         if (!firstKey) continue;

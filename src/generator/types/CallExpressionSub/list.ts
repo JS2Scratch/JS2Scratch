@@ -153,7 +153,7 @@ module.exports = {
             let args = callExpression.arguments;
             let firstArg: any = args[0];
             let key = uuid(includes.scratch_alphanumeric, 16);
-            
+
             blockCluster.addBlocks({
                 [key]: createBlock({
                     opcode: BlockOpCode.DataListContainsItem,

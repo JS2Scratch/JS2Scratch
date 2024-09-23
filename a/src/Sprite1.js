@@ -1,1 +1,0 @@
-looks.say("Hello, World!");

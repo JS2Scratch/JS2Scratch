@@ -25,7 +25,7 @@ function parseIf(Block_Cluster: BlockCluster, IfStatement: IfStatement, buildDat
     let id = uuid(includes.scratch_alphanumeric, 16);
 
     keysGenerated.push(id);
-    let substackA = parseProgram((IfStatement.consequent as BlockStatement), (IfStatement.loc as SourceLocation).filename, false)
+    let substackA = parseProgram((IfStatement.consequent as BlockStatement), (IfStatement.loc as SourceLocation).filename, false, buildData.packages)
     for (let i = 0; i < Object.keys(substackA.blocks).length; i++) {
         substackA.blocks[Object.keys(substackA.blocks)[i]].parent = id;
     }
@@ -33,7 +33,7 @@ function parseIf(Block_Cluster: BlockCluster, IfStatement: IfStatement, buildDat
     let substackB: {[key: string]: any} | undefined;
     if (IfStatement.alternate != null) {
         if (isBlockStatement(IfStatement.alternate)) {
-            substackB = parseProgram((IfStatement.alternate as BlockStatement), (IfStatement.loc as SourceLocation).filename, false)
+            substackB = parseProgram((IfStatement.alternate as BlockStatement), (IfStatement.loc as SourceLocation).filename, false, buildData.packages)
         } else if (isIfStatement(IfStatement.alternate)) {
             let newBlockCluster = new BlockCluster();
             let ifData = parseIf(newBlockCluster, IfStatement.alternate, buildData);
@@ -58,7 +58,7 @@ function parseIf(Block_Cluster: BlockCluster, IfStatement: IfStatement, buildDat
             parent: id,
             inputs: {
                 "OPERAND1": evaluated,
-                "OPERAND2": getScratchType(ScratchType.number, "0")
+                "OPERAND2": getScratchType(ScratchType.number, "1")
             }
         });
 

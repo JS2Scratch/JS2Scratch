@@ -26,8 +26,28 @@ module.exports = ((BlockCluster: BlockCluster, CallExpression: CallExpression, b
         let fnName = callee.property.name;
         
         let fullPath = join(__dirname, "CallExpressionSub", libName + ".ts");
-        if (!existsSync(fullPath)) { Warn(`Unknown library, got: '${libName}'`); return { err: true }; }
-        let requiredLib = require(fullPath);
+        let requiredLib: any;
+        if (!existsSync(fullPath)) {
+            // Check if this is a packaged library.
+            let valueLibs: any[] = buildData.packages.libraries.blockLibraries;
+            let finished = false;
+            let endLoop = false;
+
+            valueLibs.forEach((value) => {
+                if (!endLoop && value.name == libName) {
+                    finished = true;
+                    endLoop = true;
+                    requiredLib = value.functions;
+                }
+            });
+
+            if (!finished) {
+                Warn(`Unknown library, got: '${libName}'`);
+                return { err: true };
+            }
+        } else {
+            requiredLib = require(fullPath);
+        }
         let requiredFn = requiredLib[fnName];
 
         if (!requiredFn) { Warn(`Unknown function of library ${libName}, got: '${fnName}'`); return { err: true }; }

@@ -76,7 +76,7 @@ module.exports = {
                         parent: id,
                         inputs: {
                             "OPERAND1": evaluated,
-                            "OPERAND2": getScratchType(ScratchType.number, "0")
+                            "OPERAND2": getScratchType(ScratchType.number, "1")
                         }
                     });
 

@@ -68,7 +68,7 @@ function getVariable(Variable: string): ScratchInput {
     ]
 }
 
-function getBlockNumber(BlockID: string) {
+function getBlockNumber(BlockID: string): ScratchInput {
     return [
        3,
        BlockID,
@@ -79,7 +79,7 @@ function getBlockNumber(BlockID: string) {
     ]
 }
 
-function getBroadcast(Broadcast: string) {
+function getBroadcast(Broadcast: string): ScratchInput {
     return [
         1,
         [
@@ -90,7 +90,7 @@ function getBroadcast(Broadcast: string) {
     ]
 }
 
-function getMenu(Menu: string) {
+function getMenu(Menu: string): ScratchInput {
     return [
         1,
         Menu

@@ -11,10 +11,32 @@
 /******************************************************************/
 
 
+import { existsSync } from "fs"
 import { BlockCluster } from "./blocks"
 import { buildData, typeData } from "./types"
+import { error } from "../cli/berryProject"
 
 export function evalutate(type: string, blockCluster: BlockCluster, instance: any, id: string, buildData: buildData): typeData
 {
-    return require(`../generator/types/${type}`)(blockCluster, instance, id, buildData)
+    let data: any;
+    let s = false;
+    let packageData = buildData.packages;
+    for (let i = 0; i < packageData.type_implements.length; i++) {
+        if (packageData.type_implements[i].name == type) {
+            data = packageData.type_implements[i].body;
+            s = true;
+            break;
+        }
+    }
+
+    let path = `../generator/types/${type}.ts`;
+    if (!existsSync(path) && !s)
+    {
+        error("[internal] attempt to load non-existant type: " + type);
+    } else if (!s)
+    {
+        data = require(path.substring(0, -3));
+    }
+
+    return data(blockCluster, instance, id, buildData)
 }

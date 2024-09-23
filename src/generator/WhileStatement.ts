@@ -23,7 +23,7 @@ function parseWhile(Block_Cluster: BlockCluster, WhileStatement: WhileStatement,
     let id = uuid(includes.scratch_alphanumeric, 16);
 
     keysGenerated.push(id);
-    let substackA = parseProgram((WhileStatement.body as any), (WhileStatement.loc as SourceLocation).filename, false)
+    let substackA = parseProgram((WhileStatement.body as any), (WhileStatement.loc as SourceLocation).filename, false, buildData.packages)
     for (let i = 0; i < Object.keys(substackA.blocks).length; i++) {
         substackA.blocks[Object.keys(substackA.blocks)[i]].parent = id;
     }
@@ -38,7 +38,7 @@ function parseWhile(Block_Cluster: BlockCluster, WhileStatement: WhileStatement,
             parent: id,
             inputs: {
                 "OPERAND1": evaluated,
-                "OPERAND2": getScratchType(ScratchType.number, "0")
+                "OPERAND2": getScratchType(ScratchType.number, "1")
             }
         });
 

@@ -1,14 +1,20 @@
 {
   "name": "js2scratch",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "version": "1.0.1",
+  "description": "Allows for conversion of a JS project into a SB3 project",
+  "main": "src/index.js",
+  "bin": {
+    "berry": "src/index.js"
+  },
+  "scripts": {
+    "setup": "npm i . && npm install -g . && node src/install.js"
+  },
   "keywords": [],
-  "author": "ShadowX",
-  "license": "ISC",
+  "author": "saaawdust",
+  "license": "MIT",
   "dependencies": {
     "@babel/types": "^7.25.6",
+    "@iarna/toml": "^2.2.5",
     "chalk": "^4.0.0",
     "ts-node": "^10.9.2",
     "yargs": "^17.7.2"

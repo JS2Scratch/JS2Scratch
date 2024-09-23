@@ -65,7 +65,7 @@ function parseWhile(Block_Cluster: BlockCluster, ForStatement: ForStatement, bui
 
 
     (ForStatement.body as BlockStatement).body.unshift((update as any));
-    let substackA = parseProgram((ForStatement.body as any), (ForStatement.loc as SourceLocation).filename, false)
+    let substackA = parseProgram((ForStatement.body as any), (ForStatement.loc as SourceLocation).filename, false, buildData.packages)
     for (let i = 0; i < Object.keys(substackA.blocks).length; i++) {
         substackA.blocks[Object.keys(substackA.blocks)[i]].parent = id;
     }

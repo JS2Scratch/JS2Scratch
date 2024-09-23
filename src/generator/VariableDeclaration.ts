@@ -15,6 +15,7 @@ import { VariableDeclaration } from "@babel/types"
 import { Block, BlockOpCode, buildData, typeData } from "../util/types";
 import { getScratchType, ScratchType } from "../util/scratch-type";
 import { uuid, includes } from "../util/scratch-uuid"
+import { evalutate } from "../util/evaluate";
 
 module.exports = ((BlockCluster: BlockCluster, VariableDeclaration: VariableDeclaration, buildData: buildData) => {
 
@@ -25,8 +26,8 @@ module.exports = ((BlockCluster: BlockCluster, VariableDeclaration: VariableDecl
         let variableName = (declarations as any).id.name;
 
         let id = uuid(includes.scratch_alphanumeric, 16);
-        let value: typeData = (declarations.init != null && declarations.init != undefined)
-            ? require(`./types/${declarations.init.type}`)(BlockCluster, declarations.init, id, buildData)
+        let value: typeData | any = (declarations.init != null && declarations.init != undefined)
+            ? evalutate(declarations.init.type, BlockCluster, declarations.init, id, buildData)
             : { block: getScratchType(ScratchType.number, 0) };
 
         blocks[id] = createBlock(
