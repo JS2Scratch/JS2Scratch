@@ -1,68 +1,233 @@
-/**
- * ShadowX
- * 
- * Part of the "JS2Scratch" Project
- * 
- * [2024]
- * [ Made with love <3 ]
- *
- * @lisence MIT
- */
+/*******************************************************************
+* Copyright         : 2024 saaawdust
+* File Name         : boot.ts
+* Description       : Bootstraps the JS2Scratch environment
+*                    
+* Revision History  :
+* Date		Author 			Comments
+* ------------------------------------------------------------------
+* 13/09/2024	saaawdust	Created file, setup environment
+*
+/******************************************************************/
 
-import { new_args } from './lib/arg'
-import { argv } from 'process'
-import { errorMessages } from './lib/console'
-import { start_env, regenerate_json } from './environment/env'
-import { DirectoryBuffer, FileBuffer } from './lib/fs';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import { addDep, buildProject, createPackage, createProject, removeDep, runProject, updateDep } from "./cli/berryProject";
+import { cwd } from "process";
+import { basename, join, resolve } from "path";
+import { error } from "./cli/berryProject";
+import chalk from 'chalk';
+import { existsSync } from 'fs';
 
-let subCommand = argv[2];
+function parseStrings(...args: any) {
+    return args.map((str: any) => {
+        const [name, version] = str.split('@');
 
-if (!subCommand) {
-    errorMessages['No parameters passed']();
+        const versionIsValid = version && (/^(\d+\.)?(\d+\.)?(\d+)$/.test(version) || version === 'latest');
+
+        return {
+            name: name,
+            version: versionIsValid ? (version === 'latest' ? "*" : version) : "*"
+        };
+    });
 }
 
-// Collect arguments to see what command to run.
+yargs(hideBin(process.argv))
+    .scriptName("berry")
+    .usage('$0 <cmd> [args]')
 
-let argumentsCollected = new_args([
-    "-i", "-input",
-    "-o", "-out", "-output",
-    "-t", "-turbo", "-turbowarp",
-    "-7z", "-7z_path"
-], [
-    ["-i", "-input"],
-    ["-o", "-out", "-output"],
-    ["-t", "-turbo", "-turbowarp"],
-    ["-7z", "-7z_path"]
-]);
+    .command(
+        'new [name] [path]',
+        'Creates a new `berry` project for JS2Scratch. Bundles with a `Berry.toml`.\n',
+        (yargs) => {
+            return yargs
+                .positional('name', {
+                    type: 'string',
+                    default: 'my-project',
+                    describe: 'The name of the project'
+                })
+                .positional('path', {
+                    type: 'string',
+                    default: './',
+                    describe: 'The path to create the project'
+                });
+        },
+        (argv) => {
+            if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
 
-switch (subCommand) {
-    case "auto":
-        regenerate_json(argumentsCollected);
-        break;
-    case "build":
-        start_env(argumentsCollected);
-        break;
+            return createProject(argv.name, argv.path);
+        }
+    )
 
-    case "new":
-        let newDir = new DirectoryBuffer("Project");
-        let spriteDir = new DirectoryBuffer("Sprite1.sprite");
-        let spritImgeDir = new DirectoryBuffer("images");
-        let spriteMain = new FileBuffer("main.js", "");
-        spriteDir.Append([spriteMain,spritImgeDir]);
-        let projectJson = new FileBuffer("project.d.json", `{
-        "Sprite1": {
-            "Type": "Sprite",
-            "Costumes": [],
-             "Sounds": []
-        }}`);
+    .command(
+        'init',
+        'Creates a new `berry` project in the current-working-directrory\n',
+        () => { },
+        (argv) => {
+            if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
 
-        newDir.Append([projectJson, spriteDir]);
+            let wd = cwd();
+            return createProject(basename(wd), ".");
+        }
+    )
 
-        if (argumentsCollected["-i"] == "null") argumentsCollected["-i"] = "";
-        newDir.Instantiate(argumentsCollected["-i"]);
-        break;
-        
-    default:
-        errorMessages['Unknown parameter'](subCommand);
-}
+    .command(
+        'build [path]',
+        'Builds the current `berry` project in the current-working-directory, or in the provided one\n',
+        (yargs) => {
+            return yargs.positional('path', {
+                type: 'string',
+                default: './',
+                describe: 'Path to the `berry` project'
+            });
+        },
+        async (argv) => {
+            if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
 
+            let resolved = resolve(argv.path);
+            return await buildProject(resolved, basename(resolved));
+        }
+    )
+
+    .command(
+        'run [path]',
+        'Builds and runs the current `berry` project in the current-working-directory, or in the provided one, in TurboWarp\n',
+        (yargs) => {
+            return yargs.positional('path', {
+                type: 'string',
+                default: './',
+                describe: 'Path to the `berry` project'
+            });
+        },
+        async (argv) => {
+            if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
+
+            let resolved = resolve(argv.path);
+            return await runProject(resolved, basename(resolved));
+        }
+    )
+
+    .command(
+        'lib [name] [path]',
+        'Creates a new `berry` package for JS2Scratch. Bundles with a `Berry.toml`.\n',
+        (yargs) => {
+            return yargs
+                .positional('name', {
+                    type: 'string',
+                    default: 'my-package',
+                    describe: 'The name of the package'
+                })
+                .positional('path', {
+                    type: 'string',
+                    default: './',
+                    describe: 'The path to create the package'
+                });
+        },
+        (argv) => {
+            if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
+
+            return createPackage(argv.name, argv.path);
+        }
+    )
+    .command(
+        'add [libs...]',
+        'Adds a new dependency to the project in the current-working-directory.\n',
+        (yargs) => {
+            return yargs
+                .positional('libs', {
+                    describe: 'The libraries to include (name@version)',
+                    type: 'string',
+                    array: true
+                });
+        },
+        async (argv) => {
+            if (process.platform != "win32" && !argv.bypass) {
+                console.error("js2scratch only works on the windows architecture.");
+                return;
+            }
+
+            const parsedLibs = parseStrings(...(argv.libs as any));
+            await addDep(parsedLibs);
+        }
+    )
+
+    .command(
+        'remove [libs...]',
+        'Removes the given packages in the project that is in the current-working-directory.\n',
+        (yargs) => {
+            return yargs
+                .positional('libs', {
+                    describe: 'The libraries to remove (name)',
+                    type: 'string',
+                    array: true
+                });
+        },
+        async (argv) => {
+            if (process.platform != "win32" && !argv.bypass) {
+                console.error("js2scratch only works on the windows architecture.");
+                return;
+            }
+
+            let libs = argv.libs;
+            let libsFolder = join(cwd(), "lib");
+
+            if (!existsSync(libsFolder)) {
+                error("there are no dependencies to remove");
+            };
+
+            return removeDep(libsFolder, (libs as any));
+        }
+    )
+
+    .command(
+        'update',
+        'Reads the currently-active-Berry.toml file and adds any dependencies. Does not remove dependencies.\n',
+        (yargs) => {},
+        async (argv) => {
+            if (process.platform != "win32" && !argv.bypass) {
+                console.error("js2scratch only works on the windows architecture.");
+                return;
+            }
+
+            let libs = argv.libs;
+            let libsFolder = join(cwd(), "lib");
+
+            if (!existsSync(libsFolder)) {
+                error("there are no dependencies to remove");
+            };
+
+            if (!existsSync(join(cwd(), "Berry.toml"))) {
+                error("no 'Berry.toml' could be found");
+            };
+
+            return updateDep(libsFolder, join(cwd(), "Berry.toml"));
+        }
+    )
+
+    .command(
+        'publish',
+        'Returns information on publishing a package.',
+        (yargs) => { },
+        (argv) => {
+            // Format with links
+            console.log(chalk.blue("[INFO]") +
+                ": To publish a package on `berry`; you need to submit a pull request " +
+                "\u001b]8;;https://github.com/JS2Scratch/berry-registry/pulls\u001b\\here\u001b]8;;\u001b\\" +
+                ". More about publishing can be found " +
+                "\u001b]8;;https://github.com/JS2Scratch/berry-registry/blob/main/README.md\u001b\\here\u001b]8;;\u001b\\!");
+        }
+    )
+
+    .option('bypass', {
+        alias: 'b',
+        type: 'boolean',
+        description: 'Bypass the platform-block on JS2Scratch. May cause errors.',
+    })
+
+    // Parse the command line arguments
+    .version()
+    .alias('version', 'v')
+    .help()
+    .alias('help', 'h')
+    .demandCommand(1, chalk.red("error: ") + "invalid usage; see above ^") // Enforce command input
+    .argv;
