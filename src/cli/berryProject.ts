@@ -414,7 +414,16 @@ export async function buildProject(at: string, name: string) {
         }
     } = {};
     let stageData: { [key: string]: any } = {};
-    let config: { [key: string]: any } = {};
+    let config: { [key: string]: any } = fillDefaults({}, {
+        libraries: {
+            blockLibraries: [],
+            valueLibraries: []
+        },
+
+        globals: [],
+        implements: [],
+        type_implements: [],
+    });;
 
     libraries.forEach((value: string, index) => {
         let fullPath = join(lib, value);
