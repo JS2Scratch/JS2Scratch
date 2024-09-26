@@ -15,7 +15,7 @@ import { BlockOpCode, buildData, typeData } from "../../util/types";
 import { BlockCluster, createBlock } from "../../util/blocks";
 import { getBroadcast } from "../../util/scratch-type"
 import { Error } from "../../util/err";
-import { evalutate } from "../../util/evaluate";
+import { evaluate } from "../../util/evaluate";
 
 function createFunction(data: {
     minArgs: number,
@@ -30,7 +30,7 @@ function createFunction(data: {
 
         for (let i = 0; i < callExpression.arguments.length; i++) {
             args.push(
-                evalutate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                evaluate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
             )
         }
 

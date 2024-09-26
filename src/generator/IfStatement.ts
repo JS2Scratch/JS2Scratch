@@ -15,7 +15,7 @@ import { BlockStatement, IfStatement, SourceLocation } from "@babel/types"
 import { BlockOpCode, buildData } from "../util/types";
 import { parseProgram } from "../env/parseProgram";
 import { includes, uuid } from "../util/scratch-uuid";
-import { evalutate } from "../util/evaluate";
+import { evaluate } from "../util/evaluate";
 import { getBlockNumber, getScratchType, getSubstack, ScratchType } from "../util/scratch-type";
 import { isBlockStatement } from "@babel/types";
 import { isIfStatement } from "@babel/types";
@@ -48,7 +48,7 @@ function parseIf(Block_Cluster: BlockCluster, IfStatement: IfStatement, buildDat
         }
     }
 
-    let evaluated = evalutate(IfStatement.test.type, Block_Cluster, IfStatement.test, id, buildData).block;
+    let evaluated = evaluate(IfStatement.test.type, Block_Cluster, IfStatement.test, id, buildData).block;
     let extra: {[key: string]: any} = {};
     if (IfStatement.test.type != "LogicalExpression" && !(IfStatement.test.type == "BinaryExpression" && ["<", ">", "==", "===", "!=", "!=="].includes(IfStatement.test.operator)))
     {

@@ -479,7 +479,6 @@ export async function buildProject(at: string, name: string) {
     });
 
     let srcTree = createFileTree(resolve(src));
-    let start = new Date();
 
     spriteData.forEach((value: string) => {
         if (value == "stage") {
@@ -605,6 +604,7 @@ export async function buildProject(at: string, name: string) {
 
     deleteAllContents(tempParentLocation); // Just incase; clear it!
 
+    let start = new Date();
     new DirectoryBuffer("temp_project").Instantiate(tempParentLocation);
 
     collectedSpriteData["stage"] = stageData;

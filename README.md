@@ -247,6 +247,47 @@ let x = operation.join("Hello, ", "World!"); // Works
 operation.join("Hello, ", "World!"); // Unknown library "operation", Unknown function "join"
 ```
 
+You, the user, can also define your own functions like in normal JS:
+
+```js
+function foo(bar)
+{
+    looks.say(operation.join("foo", bar, "!"));
+}
+
+foo("bar");
+```
+
+We can make this function "run without screen refresh" by giving it the `turbo` prefix:
+
+```js
+function turbo_foo(bar)
+{
+    looks.say(operation.join("foo", bar, "!"));
+}
+
+turbo_foo("bar");
+```
+
+This function will have a name of `foo`, and will "run without screen refresh".
+
+> [!WARNING]
+> Passing too many arguments, or too little, will cause the function to not run at all. The correct amount of arguments, if any, must be passed.
+
+# Event blocks
+
+Sometimes, you may not want the green-flag to be the header block of your program. You can add a simple directive to change this; the following is a list of all the directives. Some directives require arguments to make them work (E.g, when KEY pressed). These directives MUST be on the first line:
+
+```js
+//#whenflagclicked() -> When Green flag clicked
+//#whenthisspriteclicked() -> When this sprite clicked
+//#start_as_clone() -> When I start as clone
+//#whenkeypressed(Key: string) -> When key pressed  -> Example: #whenkeypressed("space")
+//#whenbackdropswitchesto(Backdrop: string) -> When backdrop switches to  -> Example: #whenbackdropswitchesto("Backdrop1")
+//#whengreaterthan(Type: "loudness" | "timer", Amount: number) -> When greater than  -> Example: #whengreaterthan("loudness", 5)
+//#whenbroadcastreceived(Name: string) -> When broadcast received  -> Example: #whenbroadcastreceived("Message1")
+```
+
 # The `berry` registry
 
 `berry` does more than just create projects; it's a whole package manager! You can import a package from the `berry registry`, found [here](https://github.com/JS2Scratch/berry-registry)!

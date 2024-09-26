@@ -13,7 +13,7 @@
 import { Block, CallExpression } from "@babel/types";
 import { BlockCluster } from "./blocks";
 import { Error } from "./err";
-import { evalutate } from "./evaluate";
+import { evaluate } from "./evaluate";
 import { buildData, typeData, BlockOpCode } from "./types";
 import { createBlock } from "./blocks";
 
@@ -74,7 +74,7 @@ export function createFunction<t = void>(
                 if (!data.parseArguments) continue;
 
                 args.push(
-                    evalutate(type, blockCluster as any, callExpression.arguments[i], parentID, buildData)
+                    evaluate(type, blockCluster as any, callExpression.arguments[i], parentID, buildData)
                 );
             } else if (data.argTypes && data.argTypes[i] && data.argTypes[i] != type) {
                 new Error(

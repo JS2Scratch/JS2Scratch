@@ -15,7 +15,7 @@
 import { BlockCluster, createBlock, isSpiky, isSpikyType } from "../../util/blocks";
 import { CallExpression, isCallExpression, LogicalExpression, SourceLocation } from "@babel/types"
 import { getBlockNumber } from "../../util/scratch-type"
-import { evalutate } from "../../util/evaluate"
+import { evaluate } from "../../util/evaluate"
 import { includes, uuid } from "../../util/scratch-uuid";
 import { BlockOpCode, buildData } from "../../util/types";
 import { Error, ErrorPosition } from "../../util/err";
@@ -58,8 +58,8 @@ function isComparisonOperator(value: string) {
 
 module.exports = ((BlockCluster: BlockCluster, LogicalExpression: LogicalExpression, ParentID: string, buildData: buildData) => {
     const id = uuid(includes.scratch_alphanumeric, 16);
-    const leftHandSide = evalutate(LogicalExpression.left.type, BlockCluster, LogicalExpression.left, id, buildData);
-    const rightHandSide = evalutate(LogicalExpression.right.type, BlockCluster, LogicalExpression.right, id, buildData);
+    const leftHandSide = evaluate(LogicalExpression.left.type, BlockCluster, LogicalExpression.left, id, buildData);
+    const rightHandSide = evaluate(LogicalExpression.right.type, BlockCluster, LogicalExpression.right, id, buildData);
 
     let op = numericalOperators[LogicalExpression.operator]
 

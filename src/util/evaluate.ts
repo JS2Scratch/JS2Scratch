@@ -1,6 +1,6 @@
 /*******************************************************************
 * Copyright         : 2024 saaawdust
-* File Name         : evalutate.ts
+* File Name         : evaluate.ts
 * Description       : Evaluates a type
 *                    
 * Revision History  :
@@ -17,7 +17,7 @@ import { buildData, typeData } from "./types"
 import { error } from "../cli/berryProject"
 import { join } from "path";
 
-export function evalutate(type: string, blockCluster: BlockCluster, instance: any, id: string, buildData: buildData): typeData
+export function evaluate(type: string, blockCluster: BlockCluster, instance: any, id: string, buildData: buildData): typeData
 {
     let data: any;
     let s = false;
