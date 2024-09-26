@@ -17,7 +17,7 @@ const { register } = require('ts-node');
 
 function init(filePath)
 {
-    register({ project: join(__dirname, "tsconfig.json"), transpileOnly: false });
+    register({ project: join(__dirname, "tsconfig.json"), transpileOnly: true });
     const result = require(filePath);
     return result.default || result;
 }
