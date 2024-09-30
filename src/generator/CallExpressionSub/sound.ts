@@ -81,6 +81,17 @@ module.exports = {
         })
     }),
 
+    clearEffects: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
+            blockCluster.addBlocks({
+                [parentID]: createBlock({
+                    opcode: BlockOpCode.SoundClearEffects,
+                })
+            })
+        })
+    }),
+
     changeEffect: createFunction({
         minArgs: 2,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
