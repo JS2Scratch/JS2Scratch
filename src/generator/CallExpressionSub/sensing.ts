@@ -54,7 +54,7 @@ module.exports = {
     }),
 
     resetTimer: createFunction({
-        minArgs: 1,
+        minArgs: 0,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
             blockCluster.addBlocks({
                 [parentID]: createBlock({
