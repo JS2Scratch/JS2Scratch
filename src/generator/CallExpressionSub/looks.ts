@@ -16,7 +16,7 @@ import { BlockCluster, createBlock } from "../../util/blocks";
 import { includes, uuid } from "../../util/scratch-uuid"
 import { getBlockNumber, getMenu, getScratchType, ScratchType } from "../../util/scratch-type"
 import { Error } from "../../util/err";
-import { evalutate } from "../../util/evaluate";
+import { evaluate } from "../../util/evaluate";
 
 const graphicEffects = [
     "COLOR",
@@ -41,7 +41,7 @@ function createFunction(data: {
 
         for (let i = 0; i < callExpression.arguments.length; i++) {
             args.push(
-                evalutate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                evaluate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
             )
         }
 
@@ -129,7 +129,7 @@ module.exports = {
                             callExpression.arguments[0].type == "StringLiteral" && callExpression.arguments[0].value || "",
                             null
                         ]
-                    }
+                    },
                 })
             })
         })

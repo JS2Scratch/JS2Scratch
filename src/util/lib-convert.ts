@@ -13,14 +13,14 @@
 import { Block, CallExpression } from "@babel/types";
 import { BlockCluster } from "./blocks";
 import { Error } from "./err";
-import { evalutate } from "./evaluate";
+import { evaluate } from "./evaluate";
 import { buildData, typeData, BlockOpCode } from "./types";
 import { createBlock } from "./blocks";
 
 export interface BlockClustering {
-    blocks: { [key: string]: Block };
+    blocks: { any: Block };
 
-    addBlocks(blocks: { [key: string]: Block }): void;
+    addBlocks(blocks: any): void;
 }
 
 export { BlockOpCode, buildData, typeData, Block  }
@@ -35,7 +35,7 @@ export function createFunction<t = void>(
         argTypes?: string[],
         body: (
             callExpression: CallExpression,
-            blockCluster: BlockCluster,
+            blockCluster: BlockClustering,
             parentId: string,
             buildData: buildData,
             parsedArguments?: typeData[],
@@ -47,7 +47,7 @@ export function createFunction<t = void>(
     data.argTypes = data.argTypes || [];
     data.parseArguments = data.parseArguments || false;
 
-    return ((callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData: buildData) => {
+    return ((callExpression: CallExpression, blockCluster: BlockClustering, parentID: string, buildData: buildData) => {
         if (callExpression.arguments.length < (data as any).minimumArguments) {
             new Error(
                 "Not enough arguments", 
@@ -74,7 +74,7 @@ export function createFunction<t = void>(
                 if (!data.parseArguments) continue;
 
                 args.push(
-                    evalutate(type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                    evaluate(type, blockCluster as any, callExpression.arguments[i], parentID, buildData)
                 );
             } else if (data.argTypes && data.argTypes[i] && data.argTypes[i] != type) {
                 new Error(
@@ -113,11 +113,5 @@ export function createImplementation(name: string, body: any) {
     };
 }
 
-export function createTypeImplementation(name: string, body: any) {
-    return {
-        name,
-        body
-    };
-}
 
 export { createBlock }

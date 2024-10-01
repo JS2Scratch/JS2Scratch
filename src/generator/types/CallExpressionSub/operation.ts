@@ -16,7 +16,7 @@ import { BlockCluster, createBlock } from "../../../util/blocks";
 import { includes, uuid } from "../../../util/scratch-uuid"
 import { getBlockNumber } from "../../../util/scratch-type"
 import { Error } from "../../../util/err";
-import { evalutate } from "../../../util/evaluate";
+import { evaluate } from "../../../util/evaluate";
 
 function createFunction(data: {
     minArgs: number,
@@ -31,7 +31,7 @@ function createFunction(data: {
 
         for (let i = 0; i < callExpression.arguments.length; i++) {
             args.push(
-                evalutate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                evaluate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
             )
         }
 
@@ -45,11 +45,11 @@ module.exports = {
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData) => {
             let args = callExpression.arguments;
             let leftKey = uuid(includes.scratch_alphanumeric, 16);
-            let leftOperand = evalutate(args[0].type, blockCluster, args[0], leftKey, buildData);
+            let leftOperand = evaluate(args[0].type, blockCluster, args[0], leftKey, buildData);
 
             args.forEach((arg, index) => {
                 let newJoinBlockId = uuid(includes.scratch_alphanumeric, 16);
-                let rightOperand = evalutate(arg.type, blockCluster, arg, leftKey, buildData);
+                let rightOperand = evaluate(arg.type, blockCluster, arg, leftKey, buildData);
 
                 blockCluster.addBlocks({
                     [newJoinBlockId]: createBlock({

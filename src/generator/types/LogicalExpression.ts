@@ -15,7 +15,7 @@
 import { BlockCluster, createBlock, isSpiky, isSpikyType } from "../../util/blocks";
 import { CallExpression, isCallExpression, LogicalExpression, SourceLocation } from "@babel/types"
 import { getBlockNumber } from "../../util/scratch-type"
-import { evalutate } from "../../util/evaluate"
+import { evaluate } from "../../util/evaluate"
 import { includes, uuid } from "../../util/scratch-uuid";
 import { BlockOpCode, buildData } from "../../util/types";
 import { Error, ErrorPosition } from "../../util/err";
@@ -58,8 +58,8 @@ function isComparisonOperator(value: string) {
 
 module.exports = ((BlockCluster: BlockCluster, LogicalExpression: LogicalExpression, ParentID: string, buildData: buildData) => {
     const id = uuid(includes.scratch_alphanumeric, 16);
-    const leftHandSide = evalutate(LogicalExpression.left.type, BlockCluster, LogicalExpression.left, id, buildData);
-    const rightHandSide = evalutate(LogicalExpression.right.type, BlockCluster, LogicalExpression.right, id, buildData);
+    const leftHandSide = evaluate(LogicalExpression.left.type, BlockCluster, LogicalExpression.left, id, buildData);
+    const rightHandSide = evaluate(LogicalExpression.right.type, BlockCluster, LogicalExpression.right, id, buildData);
 
     let op = numericalOperators[LogicalExpression.operator]
 
@@ -75,6 +75,7 @@ module.exports = ((BlockCluster: BlockCluster, LogicalExpression: LogicalExpress
                     && (LogicalExpression as any).left.callee.property)
                 && isSpikyType((LogicalExpression as any).left.callee.object.name, (LogicalExpression as any).left.callee.property.name))
             && LogicalExpression.left.type != "LogicalExpression"
+            && LogicalExpression.left.type != "BooleanLiteral"
             && !(LogicalExpression.left.type == "BinaryExpression"
                 && isComparisonOperator(LogicalExpression.left.operator))) {
             let loc = (LogicalExpression.left.loc as SourceLocation);
@@ -88,13 +89,14 @@ module.exports = ((BlockCluster: BlockCluster, LogicalExpression: LogicalExpress
             );
         } else if (
             !(isCallExpression(LogicalExpression.right)
-            && ((LogicalExpression as any).right.callee
-            && (LogicalExpression as any).right.callee.object
-            && (LogicalExpression as any).right.callee.property)
-            && isSpikyType((LogicalExpression as any).right.callee.object.name, (LogicalExpression as any).right.callee.property.name))
+                && ((LogicalExpression as any).right.callee
+                    && (LogicalExpression as any).right.callee.object
+                    && (LogicalExpression as any).right.callee.property)
+                && isSpikyType((LogicalExpression as any).right.callee.object.name, (LogicalExpression as any).right.callee.property.name))
             && LogicalExpression.right.type != "LogicalExpression"
+            && LogicalExpression.right.type != "BooleanLiteral"
             && !(LogicalExpression.right.type == "BinaryExpression"
-            && isComparisonOperator(LogicalExpression.right.operator))) {
+                && isComparisonOperator(LogicalExpression.right.operator))) {
             let loc = (LogicalExpression.right.loc as SourceLocation);
             errs.push(
                 {

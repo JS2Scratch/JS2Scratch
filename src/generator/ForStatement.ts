@@ -15,7 +15,7 @@ import { BlockStatement, Expression, ForStatement, Identifier, SourceLocation, S
 import { BlockOpCode, buildData } from "../util/types";
 import { parseProgram } from "../env/parseProgram";
 import { includes, uuid } from "../util/scratch-uuid";
-import { evalutate } from "../util/evaluate";
+import { evaluate } from "../util/evaluate";
 import { getBlockNumber, getScratchType, getSubstack, ScratchType } from "../util/scratch-type";
 import { Error } from "../util/err";
 import { updateExpression } from "@babel/types";
@@ -52,7 +52,7 @@ function parseWhile(Block_Cluster: BlockCluster, ForStatement: ForStatement, bui
     }
 
     let extra: any = {};
-    let condition = evalutate(endCondition.type, Block_Cluster, endCondition, id, buildData)
+    let condition = evaluate(endCondition.type, Block_Cluster, endCondition, id, buildData)
     let sId = uuid(includes.scratch_alphanumeric, 16);
     extra[sId] = createBlock({
         opcode: BlockOpCode.OperatorNot,

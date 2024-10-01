@@ -16,7 +16,7 @@ import { BlockCluster, createBlock } from "../../../util/blocks";
 import { includes, uuid } from "../../../util/scratch-uuid"
 import { getBlockNumber, getScratchType, getVariable, ScratchType } from "../../../util/scratch-type"
 import { Error } from "../../../util/err";
-import { evalutate } from "../../../util/evaluate";
+import { evaluate } from "../../../util/evaluate";
 
 function createFunction(data: {
     minArgs: number,
@@ -37,7 +37,7 @@ function createFunction(data: {
                 if (!data.doParse) continue;
 
                 args.push(
-                    evalutate(type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                    evaluate(type, blockCluster, callExpression.arguments[i], parentID, buildData)
                 )
             } else if (data.argTypes && data.argTypes[i] && data.argTypes[i] != type) {
                 new Error(`Expected '${data.argTypes[i]}' for argument '${i + 1}', got: '${type}'`, buildData.originalSource.substring(callExpression.loc?.start.index || 0, callExpression.loc?.end.index || 0), [{ line: callExpression.loc?.start.line || 1, column: callExpression.loc?.start.column || 1, length: (callExpression.loc?.end.column || 1) - (callExpression.loc?.start.column || 1) }], callExpression.loc?.filename || "")

@@ -13,13 +13,13 @@
 import { BlockCluster, createBlock } from "../../util/blocks";
 import { UnaryExpression } from "@babel/types"
 import { getBlockNumber, getScratchType, ScratchType } from "../../util/scratch-type"
-import { evalutate } from "../../util/evaluate"
+import { evaluate } from "../../util/evaluate"
 import { includes, uuid } from "../../util/scratch-uuid";
 import { BlockOpCode, buildData } from "../../util/types";
 
 module.exports = ((BlockCluster: BlockCluster, UnaryExpression: UnaryExpression, ParentID: string, buildData: buildData) => {
     const id = uuid(includes.scratch_alphanumeric, 16);    
-    const data = evalutate(UnaryExpression.argument.type, BlockCluster, UnaryExpression.argument, id, buildData);
+    const data = evaluate(UnaryExpression.argument.type, BlockCluster, UnaryExpression.argument, id, buildData);
 
     let mainBlock = createBlock({
         opcode: UnaryExpression.operator == "-" ? BlockOpCode.OperatorSubtract :

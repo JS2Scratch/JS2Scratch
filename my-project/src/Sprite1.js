@@ -1,0 +1,1 @@
+looks.say(_list_test);

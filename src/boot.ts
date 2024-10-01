@@ -81,11 +81,11 @@ yargs(hideBin(process.argv))
                 describe: 'Path to the `berry` project'
             });
         },
-        (argv) => {
+        async (argv) => {
             if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
 
             let resolved = resolve(argv.path);
-            return buildProject(resolved, basename(resolved));
+            return await buildProject(resolved, basename(resolved));
         }
     )
 
@@ -99,11 +99,11 @@ yargs(hideBin(process.argv))
                 describe: 'Path to the `berry` project'
             });
         },
-        (argv) => {
+        async (argv) => {
             if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
 
             let resolved = resolve(argv.path);
-            return runProject(resolved, basename(resolved));
+            return await runProject(resolved, basename(resolved));
         }
     )
 

@@ -365,7 +365,7 @@ export async function addDep(libraries: { [key: string]: any }) {
     })
 }
 
-export function buildProject(at: string, name: string) {
+export async function buildProject(at: string, name: string) {
     info("Building ", name);
 
     let libFolder = join(__dirname, "../util/lib");
@@ -403,6 +403,8 @@ export function buildProject(at: string, name: string) {
         error("could not find `lib` directory; did you remove or forget to add it?");
     }
 
+    await updateDep(lib, join(at, "Berry.toml"));
+
     let sprites: string[] = readdirSync(assets);
     let libraries: string[] = readdirSync(lib);
     let spriteData: string[] = defJson.sprites;
@@ -412,7 +414,16 @@ export function buildProject(at: string, name: string) {
         }
     } = {};
     let stageData: { [key: string]: any } = {};
-    let config: { [key: string]: any } = {};
+    let config: { [key: string]: any } = fillDefaults({}, {
+        libraries: {
+            blockLibraries: [],
+            valueLibraries: []
+        },
+
+        globals: [],
+        implements: [],
+        type_implements: [],
+    });;
 
     libraries.forEach((value: string, index) => {
         let fullPath = join(lib, value);
@@ -445,7 +456,7 @@ export function buildProject(at: string, name: string) {
             let utilFolderPath = path.join(fullPath, 'utils');
             deleteAllContents(utilFolderPath)
             writeFileSync(join(utilFolderPath, "library.ts"), "import { createFunction, createLibrary, createValueFunction, createBlock, BlockClustering, BlockOpCode, buildData, typeData, Block, createGlobal, createImplementation } from '../../../lib-convert'; export { createFunction, createLibrary, createValueFunction, createBlock, BlockClustering, BlockOpCode, buildData, typeData, Block, createGlobal, createImplementation }");
-            writeFileSync(join(utilFolderPath, "internal.ts"), "import { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu } from '../../../scratch-type'; export { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu };");
+            writeFileSync(join(utilFolderPath, "internal.ts"), "import { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu, getList } from '../../../scratch-type'; export { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu, getList };");
         });
 
         info("Building ", element);
@@ -468,7 +479,6 @@ export function buildProject(at: string, name: string) {
     });
 
     let srcTree = createFileTree(resolve(src));
-    let start = new Date();
 
     spriteData.forEach((value: string) => {
         if (value == "stage") {
@@ -594,6 +604,7 @@ export function buildProject(at: string, name: string) {
 
     deleteAllContents(tempParentLocation); // Just incase; clear it!
 
+    let start = new Date();
     new DirectoryBuffer("temp_project").Instantiate(tempParentLocation);
 
     collectedSpriteData["stage"] = stageData;
@@ -689,8 +700,8 @@ export function buildProject(at: string, name: string) {
     info("Finished ", `${name} [unoptimized] in ${timeDifference}s`);
 }
 
-export function runProject(at: string, name: string) {
-    buildProject(at, name);
+export async function runProject(at: string, name: string) {
+    await buildProject(at, name);
     let target = join(at, "target");
     let compiled = join(target, `${name}.sb3`)
 

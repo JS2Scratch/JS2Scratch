@@ -14,7 +14,7 @@ import { ArrayExpression, CallExpression, StringLiteral } from "@babel/types";
 import { BlockOpCode, buildData, typeData } from "../../util/types";
 import { BlockCluster, createBlock } from "../../util/blocks";
 import { Error } from "../../util/err";
-import { evalutate } from "../../util/evaluate";
+import { evaluate } from "../../util/evaluate";
 import { includes, uuid } from "../../util/scratch-uuid";
 import { getBlockNumber, getScratchType, ScratchType } from "../../util/scratch-type";
 
@@ -37,7 +37,7 @@ function createFunction(data: {
                 if (!data.doParse) continue;
 
                 args.push(
-                    evalutate(type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                    evaluate(type, blockCluster, callExpression.arguments[i], parentID, buildData)
                 )
             } else if (data.argTypes && data.argTypes[i] && data.argTypes[i] != type) {
                 new Error(`Expected '${data.argTypes[i]}' for argument '${i + 1}', got: '${type}'`, buildData.originalSource.substring(callExpression.loc?.start.index || 0, callExpression.loc?.end.index || 0), [{ line: callExpression.loc?.start.line || 1, column: callExpression.loc?.start.column || 1, length: (callExpression.loc?.end.column || 1) - (callExpression.loc?.start.column || 1) }], callExpression.loc?.filename || "")
@@ -49,7 +49,7 @@ function createFunction(data: {
 }
 
 module.exports = {
-    new: createFunction({
+    newList: createFunction({
         minArgs: 2,
         argTypes: ["StringLiteral", "ArrayExpression"],
         doParse: false,
@@ -75,7 +75,7 @@ module.exports = {
                 let newID = uuid(includes.scratch_alphanumeric, 16);
                 let arrayObject = (inputArr.elements[i] as any);
 
-                let evaluation = evalutate(arrayObject.type, blockCluster, arrayObject, newID, buildData);
+                let evaluation = evaluate(arrayObject.type, blockCluster, arrayObject, newID, buildData);
 
                 blocks[previousID].next = newID;
 
@@ -121,7 +121,7 @@ module.exports = {
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData) => {
             let args = callExpression.arguments;
             let id = uuid(includes.scratch_alphanumeric, 16);
-            let evaluated = evalutate(args[1].type, blockCluster, args[1], id, buildData);
+            let evaluated = evaluate(args[1].type, blockCluster, args[1], id, buildData);
             blockCluster.addBlocks({
                 [parentID]: createBlock({
                     opcode: BlockOpCode.DataAddToList,
@@ -232,8 +232,8 @@ module.exports = {
             let args = callExpression.arguments;
             let indexID = uuid(includes.scratch_alphanumeric, 16);
             let itemID = uuid(includes.scratch_alphanumeric, 16);
-            let evaluatedIndex = evalutate(args[1].type, blockCluster, args[1], indexID, buildData);
-            let evaluatedItem =evalutate(args[2].type, blockCluster, args[2], itemID, buildData);
+            let evaluatedIndex = evaluate(args[1].type, blockCluster, args[1], indexID, buildData);
+            let evaluatedItem =evaluate(args[2].type, blockCluster, args[2], itemID, buildData);
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({
@@ -263,7 +263,7 @@ module.exports = {
 
             let args = callExpression.arguments;
             let indexID = uuid(includes.scratch_alphanumeric, 16);
-            let evaluatedIndex = evalutate(args[1].type, blockCluster, args[1], indexID, buildData);
+            let evaluatedIndex = evaluate(args[1].type, blockCluster, args[1], indexID, buildData);
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({
@@ -293,8 +293,8 @@ module.exports = {
             let args = callExpression.arguments;
             let indexID = uuid(includes.scratch_alphanumeric, 16);
             let itemID = uuid(includes.scratch_alphanumeric, 16);
-            let evaluatedIndex = evalutate(args[1].type, blockCluster, args[1], indexID, buildData);
-            let evaluatedItem =evalutate(args[2].type, blockCluster, args[2], itemID, buildData);
+            let evaluatedIndex = evaluate(args[1].type, blockCluster, args[1], indexID, buildData);
+            let evaluatedItem =evaluate(args[2].type, blockCluster, args[2], itemID, buildData);
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({

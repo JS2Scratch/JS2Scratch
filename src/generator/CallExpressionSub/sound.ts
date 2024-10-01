@@ -14,7 +14,7 @@ import { CallExpression } from "@babel/types";
 import { BlockOpCode, buildData, typeData } from "../../util/types";
 import { BlockCluster, createBlock } from "../../util/blocks";
 import { Error } from "../../util/err";
-import { evalutate } from "../../util/evaluate";
+import { evaluate } from "../../util/evaluate";
 
 const soundEffects = [
     "PITCH", "PAN"
@@ -33,7 +33,7 @@ function createFunction(data: {
 
         for (let i = 0; i < callExpression.arguments.length; i++) {
             args.push(
-                evalutate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                evaluate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
             )
         }
 
@@ -76,6 +76,17 @@ module.exports = {
             blockCluster.addBlocks({
                 [parentID]: createBlock({
                     opcode: BlockOpCode.SoundStopAllSounds,
+                })
+            })
+        })
+    }),
+
+    clearEffects: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
+            blockCluster.addBlocks({
+                [parentID]: createBlock({
+                    opcode: BlockOpCode.SoundClearEffects,
                 })
             })
         })

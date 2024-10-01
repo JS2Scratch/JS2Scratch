@@ -13,7 +13,7 @@
 import { CallExpression } from "@babel/types";
 import { BlockOpCode, buildData, typeData } from "../../util/types";
 import { Error } from "../../util/err";
-import { evalutate } from "../../util/evaluate";
+import { evaluate } from "../../util/evaluate";
 import { BlockCluster, createBlock } from "../../util/blocks";
 import { includes, uuid } from "../../util/scratch-uuid"
 import { getMenu } from "../../util/scratch-type"
@@ -31,7 +31,7 @@ function createFunction(data: {
 
         for (let i = 0; i < callExpression.arguments.length; i++) {
             args.push(
-                evalutate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                evaluate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
             )
         }
 
@@ -157,7 +157,18 @@ module.exports = {
     glideTo: createFunction({
         minArgs: 2,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
+            let firstArg: any = callExpression.arguments[0];
+            if (firstArg.type != "StringLiteral") {
+                firstArg = "random" // The default
+            } else if (firstArg.type == "StringLiteral") {
+                firstArg = firstArg.value;
+            }
+
             let menuKey = uuid(includes.alphanumeric_with_symbols, 16);
+
+            if (firstArg == "random" || firstArg == "mouse") {
+                firstArg = `_${firstArg}_`;
+            }
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({
@@ -173,7 +184,7 @@ module.exports = {
                     parent: parentID,
                     fields: {
                         "TO": [
-                            callExpression.arguments[1],
+                            firstArg,
                             null
                         ]
                     },
@@ -200,7 +211,18 @@ module.exports = {
     pointTowards: createFunction({
         minArgs: 1,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
+            let firstArg: any = callExpression.arguments[0];
+            if (firstArg.type != "StringLiteral") {
+                firstArg = "random" // The default
+            } else if (firstArg.type == "StringLiteral") {
+                firstArg = firstArg.value;
+            }
+
             let menuKey = uuid(includes.alphanumeric_with_symbols, 16);
+
+            if (firstArg == "random" || firstArg == "mouse") {
+                firstArg = `_${firstArg}_`;
+            }
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({
@@ -214,10 +236,7 @@ module.exports = {
                     opcode: BlockOpCode.MotionPointTowardsMenu,
                     parent: parentID,
                     fields: {
-                        "TOWARDS": [
-                            callExpression.arguments[1],
-                            null
-                        ]
+                        "TOWARDS": [ firstArg, null ]
                     },
                     shadow: true
                 })

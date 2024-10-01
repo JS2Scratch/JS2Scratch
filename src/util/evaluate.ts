@@ -1,6 +1,6 @@
 /*******************************************************************
 * Copyright         : 2024 saaawdust
-* File Name         : evalutate.ts
+* File Name         : evaluate.ts
 * Description       : Evaluates a type
 *                    
 * Revision History  :
@@ -15,8 +15,9 @@ import { existsSync } from "fs"
 import { BlockCluster } from "./blocks"
 import { buildData, typeData } from "./types"
 import { error } from "../cli/berryProject"
+import { join } from "path";
 
-export function evalutate(type: string, blockCluster: BlockCluster, instance: any, id: string, buildData: buildData): typeData
+export function evaluate(type: string, blockCluster: BlockCluster, instance: any, id: string, buildData: buildData): typeData
 {
     let data: any;
     let s = false;
@@ -30,12 +31,12 @@ export function evalutate(type: string, blockCluster: BlockCluster, instance: an
     }
 
     let path = `../generator/types/${type}.ts`;
-    if (!existsSync(path) && !s)
+    if (!existsSync(join(__dirname, path)) && !s)
     {
         error("[internal] attempt to load non-existant type: " + type);
     } else if (!s)
     {
-        data = require(path.substring(0, -3));
+        data = require(join(__dirname, path));
     }
 
     return data(blockCluster, instance, id, buildData)

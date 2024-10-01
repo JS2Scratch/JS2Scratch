@@ -15,7 +15,7 @@ import { AssignmentExpression } from "@babel/types"
 import { BlockOpCode, buildData } from "../util/types";
 import { uuid, includes } from "../util/scratch-uuid"
 import { getBlockNumber, getVariable } from "../util/scratch-type";
-import { evalutate } from "../util/evaluate";
+import { evaluate } from "../util/evaluate";
 
 module.exports = ((BlockCluster: BlockCluster, AssignmentExpression: AssignmentExpression, buildData: buildData) => {
 
@@ -24,7 +24,7 @@ module.exports = ((BlockCluster: BlockCluster, AssignmentExpression: AssignmentE
 
     keysGenerated.push(ID);
 
-    let newValue = evalutate(AssignmentExpression.right.type, BlockCluster, AssignmentExpression.right, ID, buildData)
+    let newValue = evaluate(AssignmentExpression.right.type, BlockCluster, AssignmentExpression.right, ID, buildData)
     switch (AssignmentExpression.operator) {
         case "=":
             BlockCluster.addBlocks({

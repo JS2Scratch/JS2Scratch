@@ -15,7 +15,7 @@ import { WhileStatement, SourceLocation } from "@babel/types"
 import { BlockOpCode, buildData } from "../util/types";
 import { parseProgram } from "../env/parseProgram";
 import { includes, uuid } from "../util/scratch-uuid";
-import { evalutate } from "../util/evaluate";
+import { evaluate } from "../util/evaluate";
 import { getBlockNumber, getScratchType, getSubstack, ScratchType } from "../util/scratch-type";
 
 function parseWhile(Block_Cluster: BlockCluster, WhileStatement: WhileStatement, buildData: buildData) {
@@ -28,7 +28,7 @@ function parseWhile(Block_Cluster: BlockCluster, WhileStatement: WhileStatement,
         substackA.blocks[Object.keys(substackA.blocks)[i]].parent = id;
     }
 
-    let evaluated = evalutate(WhileStatement.test.type, Block_Cluster, WhileStatement.test, id, buildData).block;
+    let evaluated = evaluate(WhileStatement.test.type, Block_Cluster, WhileStatement.test, id, buildData).block;
     let extra: {[key: string]: any} = {};
     if (WhileStatement.test.type != "LogicalExpression" && !(WhileStatement.test.type == "BinaryExpression" && ["<", ">", "==", "===", "!=", "!=="].includes(WhileStatement.test.operator)))
     {

@@ -1,7 +1,7 @@
 /*******************************************************************
 * Copyright         : 2024 saaawdust
-* File Name         : broadcast.ts
-* Description       : Broadcasting library
+* File Name         : sensing.ts
+* Description       : Sensing library (blocks)
 *                    
 * Revision History  :
 * Date		Author 			Comments
@@ -10,15 +10,17 @@
 *
 /******************************************************************/
 
-import { CallExpression } from "@babel/types";
+import { CallExpression, StringLiteral } from "@babel/types";
 import { BlockOpCode, buildData, typeData } from "../../util/types";
 import { BlockCluster, createBlock } from "../../util/blocks";
-import { getBroadcast } from "../../util/scratch-type"
 import { Error } from "../../util/err";
 import { evaluate } from "../../util/evaluate";
 
+
 function createFunction(data: {
     minArgs: number,
+    argTypes?: string[]
+    doParse: boolean,
     body: (parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData: buildData) => void
 }) {
     return ((callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData: buildData) => {
@@ -29,58 +31,61 @@ function createFunction(data: {
         let args: typeData[] = [];
 
         for (let i = 0; i < callExpression.arguments.length; i++) {
-            args.push(
-                evaluate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
-            )
+            let type = callExpression.arguments[i].type;
+            if ((data.argTypes && data.argTypes[i] && data.argTypes[i] == type) || !data.argTypes || data.argTypes && !data.argTypes[i]) {
+                if (!data.doParse) continue;
+
+                args.push(
+                    evaluate(type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                )
+            } else if (data.argTypes && data.argTypes[i] && data.argTypes[i] != type) {
+                new Error(`Expected '${data.argTypes[i]}' for argument '${i + 1}', got: '${type}'`, buildData.originalSource.substring(callExpression.loc?.start.index || 0, callExpression.loc?.end.index || 0), [{ line: callExpression.loc?.start.line || 1, column: callExpression.loc?.start.column || 1, length: (callExpression.loc?.end.column || 1) - (callExpression.loc?.start.column || 1) }], callExpression.loc?.filename || "")
+            }
         }
 
-        return data.body(args, callExpression, blockCluster, parentID, buildData);
+        data.body(args, callExpression, blockCluster, parentID, buildData);
     })
 }
 
 module.exports = {
-    fire: createFunction({
+    show: createFunction({
         minArgs: 1,
+        argTypes: ["StringLiteral"],
+        doParse: false,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
-
-            let args = callExpression.arguments;
-            let firstArg;
-            if (args[0].type != "StringLiteral") {
-                firstArg = "message1";
-            } else {
-                firstArg = args[0].value;
-            }
-
+            let value = (callExpression.arguments[0] as StringLiteral).value;
+            
             blockCluster.addBlocks({
                 [parentID]: createBlock({
-                    opcode: BlockOpCode.EventBroadcast,
-                    inputs: {
-                        "BROADCAST_INPUT": getBroadcast(firstArg),
+                    opcode: BlockOpCode.DataShowVariable,
+                    fields: {
+                        "VARIABLE": [
+                            value,
+                            value
+                        ],
                     }
-                }),
+                })
             })
         })
     }),
 
-    fireYield: createFunction({
+    hide: createFunction({
         minArgs: 1,
+        argTypes: ["StringLiteral"],
+        doParse: false,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
-
-            let args = callExpression.arguments;
-            let firstArg;
-            if (args[0].type != "StringLiteral") {
-                firstArg = "message1";
-            } else {
-                firstArg = args[0].value;
-            }
-
+            let value = (callExpression.arguments[0] as StringLiteral).value;
+            
             blockCluster.addBlocks({
                 [parentID]: createBlock({
-                    opcode: BlockOpCode.EventBroadcastAndWait,
-                    inputs: {
-                        "BROADCAST_INPUT": getBroadcast(firstArg),
+                    opcode: BlockOpCode.DataHideVariable,
+                    fields: {
+                        "VARIABLE": [
+                            value,
+                            value
+                        ],
                     }
-                }),
+                })
             })
         })
     }),

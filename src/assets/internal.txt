@@ -78,3 +78,11 @@ export function getBroadcast(Broadcast: string): ScratchInput { return [0] }
  * @returns - A scratch-type
  */
 export function getMenu(Menu: string): ScratchInput { return [0] }
+
+/**
+ * Returns a scratch-list, from the given ID
+ * @constructor
+ * @param List - The ID
+ * @returns - A scratch-type
+ */
+export function getList(List: string): ScratchInput { return [0] }

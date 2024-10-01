@@ -12,11 +12,12 @@
 *
 /******************************************************************/
 
+const { join } = require('path');
 const { register } = require('ts-node');
 
 function init(filePath)
 {
-    register();
+    register({ project: join(__dirname, "tsconfig.json"), transpileOnly: true });
     const result = require(filePath);
     return result.default || result;
 }

@@ -16,7 +16,7 @@ import { BlockCluster, createBlock } from "../../util/blocks";
 import { includes, uuid } from "../../util/scratch-uuid"
 import { getBlockNumber, getMenu, getScratchType, ScratchType } from "../../util/scratch-type"
 import { Error } from "../../util/err";
-import { evalutate } from "../../util/evaluate";
+import { evaluate } from "../../util/evaluate";
 import * as babel from "@babel/parser";
 
 function createFunction(data: {
@@ -32,7 +32,7 @@ function createFunction(data: {
 
         for (let i = 0; i < callExpression.arguments.length; i++) {
             args.push(
-                evalutate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
+                evaluate(callExpression.arguments[i].type, blockCluster, callExpression.arguments[i], parentID, buildData)
             )
         }
 
@@ -90,7 +90,7 @@ module.exports = {
                     ).displayError()
                 }
             } else {
-                evaluated = evalutate(babelParsed.type, blockCluster, babelParsed, id, buildData).block;
+                evaluated = evaluate(babelParsed.type, blockCluster, babelParsed, id, buildData).block;
             }
 
             blockCluster.addBlocks({

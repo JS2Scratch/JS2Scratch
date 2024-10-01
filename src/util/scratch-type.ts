@@ -68,6 +68,21 @@ function getVariable(Variable: string): ScratchInput {
     ]
 }
 
+function getList(List: string): ScratchInput {
+    return [
+        3,
+        [
+            13,
+            List,
+            List
+        ],
+        [
+            4,
+            ""
+        ]
+    ]
+}
+
 function getBlockNumber(BlockID: string): ScratchInput {
     return [
        3,
@@ -97,4 +112,4 @@ function getMenu(Menu: string): ScratchInput {
     ]
 }
 
-export { getScratchType, getColor, getVariable, getBlockNumber, getMenu, getBroadcast, getSubstack }
+export { getScratchType, getColor, getVariable, getBlockNumber, getMenu, getBroadcast, getSubstack, getList }

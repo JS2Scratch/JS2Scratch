@@ -13,7 +13,7 @@
 import { BlockCluster, createBlock } from "../../util/blocks";
 import { BinaryExpression } from "@babel/types"
 import { getBlockNumber } from "../../util/scratch-type"
-import { evalutate } from "../../util/evaluate"
+import { evaluate } from "../../util/evaluate"
 import { includes, uuid } from "../../util/scratch-uuid";
 import { BlockOpCode, buildData } from "../../util/types";
 
@@ -47,8 +47,8 @@ const numericalFields: {[key: string]: string} = {
 
 module.exports = ((BlockCluster: BlockCluster, BinaryExpression: BinaryExpression, ParentID: string, buildData: buildData) => {
     let id = uuid(includes.scratch_alphanumeric, 16);
-    const leftHandSide = evalutate(BinaryExpression.left.type, BlockCluster, BinaryExpression.left, id, buildData);
-    const rightHandSide = evalutate(BinaryExpression.right.type, BlockCluster, BinaryExpression.right, id, buildData);
+    const leftHandSide = evaluate(BinaryExpression.left.type, BlockCluster, BinaryExpression.left, id, buildData);
+    const rightHandSide = evaluate(BinaryExpression.right.type, BlockCluster, BinaryExpression.right, id, buildData);
 
     BlockCluster.addBlocks({
         [id]: createBlock({

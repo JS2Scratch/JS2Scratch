@@ -11,8 +11,8 @@
 /******************************************************************/
 
 import { BlockCluster, createBlock } from "../../util/blocks";
-import { Identifier, isStaticBlock } from "@babel/types"
-import { getBlockNumber, getVariable } from "../../util/scratch-type"
+import { Identifier } from "@babel/types"
+import { getBlockNumber, getVariable, getList } from "../../util/scratch-type"
 import { BlockOpCode, buildData } from "../../util/types";
 import { includes, uuid } from "../../util/scratch-uuid";
 
@@ -146,6 +146,7 @@ module.exports = ((BlockCluster: BlockCluster, Identifier: Identifier, _: any, b
     } else {
         let globals: any[] = buildData.packages.globals;
         let finalValue: any = undefined;
+
         globals.forEach((value) => {
             if (finalValue == undefined && value.name == Identifier.name)
             {
@@ -153,10 +154,11 @@ module.exports = ((BlockCluster: BlockCluster, Identifier: Identifier, _: any, b
             }
         })
 
+        let isList = Identifier.name.startsWith("_list_");
         return finalValue != undefined && finalValue || {
             isStaticValue: true,
             blockId: null,
-            block: getVariable(Identifier.name)
+            block: !isList && getVariable(Identifier.name) || getList(Identifier.name.slice(6))
         }
     }
 })
