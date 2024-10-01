@@ -158,6 +158,13 @@ Keep in mind scratch is very strict with logical expressions. In some cases, JS2
 5 + 1 && false // Valid in some cases
 ```
 
+A `not` must be followed by a valid boolean expression (otherwise the entire program will not compile):
+
+```js
+!("hello") // Invalid
+!(5 == 2) // Valid
+```
+
 ## Control flow
 
 ### If statements
