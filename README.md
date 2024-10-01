@@ -139,6 +139,9 @@ let y = x; // Valid
 
 y = 2 * 3; // Valid
 
+// Reference to a list named 'example' (the _list_ will be omitted)
+let z = _list_example
+
 // hello_world.js
 
 let myStr = "Hello, World!";

@@ -456,7 +456,7 @@ export async function buildProject(at: string, name: string) {
             let utilFolderPath = path.join(fullPath, 'utils');
             deleteAllContents(utilFolderPath)
             writeFileSync(join(utilFolderPath, "library.ts"), "import { createFunction, createLibrary, createValueFunction, createBlock, BlockClustering, BlockOpCode, buildData, typeData, Block, createGlobal, createImplementation } from '../../../lib-convert'; export { createFunction, createLibrary, createValueFunction, createBlock, BlockClustering, BlockOpCode, buildData, typeData, Block, createGlobal, createImplementation }");
-            writeFileSync(join(utilFolderPath, "internal.ts"), "import { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu } from '../../../scratch-type'; export { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu };");
+            writeFileSync(join(utilFolderPath, "internal.ts"), "import { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu, getList } from '../../../scratch-type'; export { ScratchType, getSubstack, getScratchType, getColor, getVariable, getBlockNumber, getBroadcast, getMenu, getList };");
         });
 
         info("Building ", element);
