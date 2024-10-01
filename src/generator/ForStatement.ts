@@ -36,7 +36,7 @@ function parseWhile(Block_Cluster: BlockCluster, ForStatement: ForStatement, bui
         return;
     }
 
-    if (!(endCondition.type == "BinaryExpression" && ["<", ">", "==", "===", "!=", "!=="].includes((endCondition).operator)) && (endCondition).type != "LogicalExpression") {
+    if (!(endCondition.type == "BinaryExpression" && ["<", ">", "==", "===", "!=", "!=="].includes((endCondition).operator)) && (endCondition).type != "LogicalExpression" && endCondition.type != "UnaryExpression") {
         new Error("The second argument of a For loop must be a valid expression (Binary / logical expression).", buildData.originalSource, [{ line: endCondition?.loc?.start.line || 1, length: 5, column: endCondition?.loc?.start.column || 1 }], ForStatement.loc?.filename || "")
         return;
     }
