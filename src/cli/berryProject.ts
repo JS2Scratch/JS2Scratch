@@ -172,7 +172,7 @@ function validatePropSchema(objects: any, basePath: string, name: string, type: 
                 throw new Error(`${name}: not a file: '${basename(fullPath)}'`);
             }
 
-            costumes.push({ name: obj.name, file: fullPath });
+            costumes.push({ name: obj.name, file: fullPath, x: obj.x || 0, y: obj.y || 0 });
         });
     } catch (err: any) {
         error(err.message);
@@ -619,16 +619,18 @@ export async function buildProject(at: string, name: string) {
         let sounds: Sound[] = [];
         let blocks: any = {};
 
-        (value.costumes as any[]).forEach((value: { [key: string]: string }, index) => {
+        (value.costumes as any[]).forEach((value: { [key: string]: string }) => {
             costumes.push(
                 createCostume({
                     name: value.name,
-                    path: value.file
+                    path: value.file,
+                    rotationCenterX: value.x as any,
+                    rotationCenterY: value.yellow as any
                 })
             );
         });
 
-        (value.sounds as any[]).forEach((value: { [key: string]: string }, index) => {
+        (value.sounds as any[]).forEach((value: { [key: string]: string }) => {
             sounds.push(
                 createSound({
                     name: value.name,
@@ -637,13 +639,15 @@ export async function buildProject(at: string, name: string) {
             );
         });
 
-        (value.blocks as any[]).forEach((file: string, index) => {
+        (value.blocks as any[]).forEach((file: string) => {
             let content = readFileSync(file).toString();
             blocks = {
                 ...blocks,
                 ...parseProgram(content, basename(file), true, config).blocks
             };
         });
+
+        console.log(blocks)
 
         let spriteData = value.data;
         physicalSprites.push(
