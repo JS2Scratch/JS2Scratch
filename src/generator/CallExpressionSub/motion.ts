@@ -75,7 +75,7 @@ module.exports = {
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
             blockCluster.addBlocks({
                 [parentID]: createBlock({
-                    opcode: BlockOpCode.MotionTurnRight,
+                    opcode: BlockOpCode.MotionTurnLeft,
                     inputs: {
                         "DEGREES": parsedArguments[0].block
                     }
