@@ -16,6 +16,8 @@ import { BlockCluster, createBlock } from "../../util/blocks";
 import { getBroadcast } from "../../util/scratch-type"
 import { Error } from "../../util/err";
 import { evaluate } from "../../util/evaluate";
+import { readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 
 function createFunction(data: {
     minArgs: number,
@@ -41,7 +43,7 @@ function createFunction(data: {
 module.exports = {
     fire: createFunction({
         minArgs: 1,
-        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData) => {
 
             let args = callExpression.arguments;
             let firstArg;
@@ -50,6 +52,12 @@ module.exports = {
             } else {
                 firstArg = args[0].value;
             }
+
+            let broadcasts = join(__dirname, "../../assets/broadcasts.json");
+            let broadcastArr = (JSON.parse(readFileSync(broadcasts).toString()) as string[]);
+            
+            if (!broadcastArr.includes(firstArg)) broadcastArr.push(firstArg);
+            writeFileSync(broadcasts, JSON.stringify(broadcastArr));
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({
@@ -73,6 +81,12 @@ module.exports = {
             } else {
                 firstArg = args[0].value;
             }
+
+            let broadcasts = join(__dirname, "../../assets/broadcasts.json");
+            let broadcastArr = (JSON.parse(readFileSync(broadcasts).toString()) as string[]);
+            
+            if (!broadcastArr.includes(firstArg)) broadcastArr.push(firstArg);
+            writeFileSync(broadcasts, JSON.stringify(broadcastArr));
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({

@@ -129,7 +129,7 @@ module.exports = {
                             callExpression.arguments[0].type == "StringLiteral" && callExpression.arguments[0].value || "",
                             null
                         ]
-                    }
+                    },
                 })
             })
         })

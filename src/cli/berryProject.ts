@@ -377,8 +377,7 @@ export async function buildProject(at: string, name: string) {
     }
 
     let bt = toml.parse(readFileSync(join(at, "Berry.toml")).toString())
-    if (!bt.package || bt.package && (bt.package as any).type != "project")
-    {
+    if (!bt.package || bt.package && (bt.package as any).type != "project") {
         error("this is not a `berry` project!");
     }
 
@@ -405,6 +404,9 @@ export async function buildProject(at: string, name: string) {
     }
 
     await updateDep(lib, join(at, "Berry.toml"));
+
+    let broadcastJson = join(__dirname, "../assets/broadcasts.json");
+    writeFileSync(broadcastJson, "[]");
 
     let sprites: string[] = readdirSync(assets);
     let libraries: string[] = readdirSync(lib);
@@ -614,6 +616,7 @@ export async function buildProject(at: string, name: string) {
     let spriteNames = Object.keys(collectedSpriteData);
     let physicalSprites: Sprite[] = [];
 
+
     spriteDatas.forEach((value, index) => {
         let spriteName = spriteNames[index];
         let costumes: Costume[] = [];
@@ -668,6 +671,19 @@ export async function buildProject(at: string, name: string) {
             })
         );
     })
+
+    let broadcastData = JSON.parse(readFileSync(broadcastJson).toString()) as string[];
+    let broadcasts: any = {};
+
+    broadcastData.forEach((v) => {
+        broadcasts[v] = v;
+    })
+
+    physicalSprites.forEach((v) => {
+        if (v.isStage) {
+            v.broadcasts = broadcasts;
+        }
+    });
 
     let project: Project = {
         targets: physicalSprites,

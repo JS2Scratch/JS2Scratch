@@ -359,7 +359,7 @@ export interface typeData {
 export interface buildData {
     instruction: number,
     originalSource: string,
-    packages: {[key: string]: any}
+    packages: {[key: string]: any},
 }
 
 export interface generatedData {

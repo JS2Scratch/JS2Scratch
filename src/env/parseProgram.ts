@@ -20,6 +20,7 @@ import chalk from "chalk";
 import { existsSync } from "fs";
 import { join } from "path";
 import { getScratchType, ScratchType } from "../util/scratch-type";
+import { includes, uuid } from "../util/scratch-uuid";
 
 function extractSubstringFromCode(code: string, line: number) {
     const lines = code.split('\n');
@@ -147,6 +148,8 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
     }
 
     let blockCluster = new BlockCluster();
+
+    let initHat = uuid(includes.scratch_alphanumeric, 16);
     if (includeHat) {
         let initBlock = createBlock({
             topLevel: true
@@ -155,12 +158,13 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
         if (file && file.comments && file.comments.length != 0) {
             let directiveComment = file.comments[0];
             let commentSrc = directiveComment.value;
+
+            
     
             if (commentSrc.substring(0, 1) == "#") {
                 commentSrc = commentSrc.substring(1);
     
                 let parsedFunc = parseFunctionCall(commentSrc);
-    
                 switch (parsedFunc.node) {
                     case BlockOpCode.EventWhenThisSpriteClicked:
                         initBlock.opcode = BlockOpCode.EventWhenThisSpriteClicked;
@@ -216,11 +220,12 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
         }
 
         blockCluster.addBlocks({
-            ["_init"]: initBlock
+            [initHat]: initBlock
         });
     }
 
-    let lastKey = includeHat && "_init" || null;
+    let lastKey = includeHat && initHat || null;
+
     for (let i = 0; i < program.length; i++) {
         let fileData = join(__dirname, "../", `generator/${program[i].type}`);
         if (program[i].type == "EmptyStatement") continue;
