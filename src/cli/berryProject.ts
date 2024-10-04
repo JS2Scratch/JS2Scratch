@@ -625,7 +625,7 @@ export async function buildProject(at: string, name: string) {
                     name: value.name,
                     path: value.file,
                     rotationCenterX: value.x as any,
-                    rotationCenterY: value.yellow as any
+                    rotationCenterY: value.y as any
                 })
             );
         });
@@ -646,8 +646,6 @@ export async function buildProject(at: string, name: string) {
                 ...parseProgram(content, basename(file), true, config).blocks
             };
         });
-
-        console.log(blocks)
 
         let spriteData = value.data;
         physicalSprites.push(
