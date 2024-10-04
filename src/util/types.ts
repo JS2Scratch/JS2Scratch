@@ -316,7 +316,8 @@ export interface Sprite {
     size: number,
     direction: number,
     draggable: boolean,
-    rotationStyle: "all around"
+    rotationStyle: "all around",
+    layerOrder?: number
 }
 
 

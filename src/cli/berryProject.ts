@@ -40,6 +40,7 @@ function createProjectContents(name: string, in_folder: string) {
                 volume: 100,
                 visible: true,
                 currentCostume: 0,
+                layerOrder: 0,
             }, null, 2)),
 
             new DirectoryBuffer("sound").Append([
@@ -662,7 +663,8 @@ export async function buildProject(at: string, name: string) {
                 direction: spriteData.direction,
                 volume: spriteData.volume,
                 visible: spriteData.visible,
-                currentCostume: spriteData.currentCostume
+                currentCostume: spriteData.currentCostume,
+                layerOrder: spriteData.layerOrder
             })
         );
     })

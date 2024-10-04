@@ -101,7 +101,8 @@ export function createSprite({
     size = 100,
     direction = 90,
     draggable = false,
-    rotationStyle = "all around"
+    rotationStyle = "all around",
+    layerOrder = 0,
 }: Partial<Sprite> = {}) {
 
     if (costumes.length == 0) {
@@ -137,6 +138,7 @@ export function createSprite({
         direction,
         draggable,
         rotationStyle,
+        layerOrder
     };
 }
 
