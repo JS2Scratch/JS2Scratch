@@ -224,7 +224,7 @@ module.exports = {
 
     insert: createFunction({
         minArgs: 3,
-        argTypes: ["StringLiteral", "NumericLiteral"],
+        argTypes: ["StringLiteral"],
         doParse: false,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData) => {
             let listName = (callExpression.arguments[0] as StringLiteral).value;
@@ -256,7 +256,7 @@ module.exports = {
 
     deleteIndex: createFunction({
         minArgs: 2,
-        argTypes: ["StringLiteral", "NumericLiteral"],
+        argTypes: ["StringLiteral"],
         doParse: false,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData) => {
             let listName = (callExpression.arguments[0] as StringLiteral).value;
@@ -285,7 +285,7 @@ module.exports = {
 
     replace: createFunction({
         minArgs: 3,
-        argTypes: ["StringLiteral", "NumericLiteral"],
+        argTypes: ["StringLiteral"],
         doParse: false,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData) => {
             let listName = (callExpression.arguments[0] as StringLiteral).value;

@@ -257,6 +257,112 @@ let x = operation.join("Hello, ", "World!"); // Works
 operation.join("Hello, ", "World!"); // Unknown library "operation", Unknown function "join"
 ```
 
+Here is a list of all functions:
+```js
+motion.move(steps: number);
+motion.turnRight(degrees: number);
+motion.turnLeft(degrees: number);
+motion.turnRight(degrees: number);
+motion.gotoXY(X: number, Y: number);
+motion.goto(object: string);
+motion.glide(time: number, X: number, Y: number);
+motion.glideTo(time: number, object: string);
+motion.point(direction: number);
+motion.pointTowards(direction: string);
+motion.changeX(value: string);
+motion.setX(value: string);
+motion.changeY(value: string);
+motion.setY(value: string);
+motion.bounceOnEdge();
+motion.setRotationStyle(value: string);
+
+looks.sayForSeconds(message: string, time: number);
+looks.say(message: string);
+looks.thinkForSecs(message: string, time: number);
+looks.think(message: string);
+looks.sayForSeconds(message: string, time: number);
+looks.switchCostumeTo(costume: string);
+looks.switchBackdropTo(backdrop: string);
+looks.nextCostume();
+looks.previousCostume();
+looks.nextBackdrop();
+looks.previousBackdrop();
+looks.changeSizeBy(factor: number);
+looks.setSizeTo(value: number);
+looks.changeGraphicEffect();
+looks.changeGraphicEffect(type: string, value: number);
+looks.setGraphicEffect(type: string, value: number);
+looks.setLayer(layer: number);
+looks.changeLayer(amount: number);
+looks.show();
+looks.hide();
+
+sound.playSoundUntilDone(sound: string);
+sound.playSound(sound: string);
+sound.stopAllSounds();
+sound.clearEffects();
+sound.changeEffect(type: string, value: number);
+sound.setEffect(type: string, value: number);
+sound.changeVolume(value: number);
+sound.setVolume(value: number);
+
+broadcast.fire(name: string);
+broadcast.fireYield(name: string);
+
+control.wait(length: number);
+control.waitUntil(expression: string); // E.x: control.waitUntil("x < 3");
+control.stop(type: string);
+control.clone();
+control.deleteClone();
+control.heartbeat(length: number);
+
+sensing.ask(question: string);
+sensing.resetTimer();
+sensing.setDragMode(type: string);
+sensing.touching(object: string);
+sensing.touchingColor(hex: string);
+sensing.distanceTo(object: string);
+sensing.mouseDown();
+sensing.keyDown(key: string);
+sensing.itemOfObject(a: string, b: string);
+sensing.current(dateType: string);
+
+math.random(min: number, max: number);
+math.mod(value: number);
+math.round(value: number);
+math.operation(type: string, value: number);
+math.pi();
+math.pow(base: number, exponent: number); // This doesn't support negative exponents
+
+variable.show(name: string);
+variable.hide(name: string);
+
+list.newList(name: string);
+list.push(list: string, value: any);
+list.pop(list: string);
+list.shift(list: string);
+list.clear(list: string);
+list.insert(list: string, index: number, value: any);
+list.deleteIndex(list: string, index: number);
+list.replace(list: string, index: number, value: any);
+list.show(list: string);
+list.hide(list: string);
+list.getItem(list: string, index: number);
+list.getItemIndex(list: string, value: any);
+list.length(list: string);
+list.contains(list: string, value: any);
+
+pen.clear();
+pen.stamp();
+pen.down();
+pen.up();
+pen.changeEffect(type: string, factor: number);
+pen.setEffect(type: string, factor: number);
+pen.changeSize(factor: number);
+pen.setSize(size: number);
+pen.setColor(hex: string);
+```
+
 You, the user, can also define your own functions like in normal JS:
 
 ```js
