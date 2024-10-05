@@ -163,6 +163,33 @@ module.exports = {
         })
     }),
 
+    switchBackdropToAndWait: createFunction({
+        minArgs: 1,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
+
+            let menuKey = uuid(includes.scratch_alphanumeric, 16);
+            blockCluster.addBlocks({
+                [parentID]: createBlock({
+                    opcode: BlockOpCode.LooksSwitchBackdropToAndWait,
+                    inputs: {
+                        "BACKDROP": getMenu(menuKey),
+                    }
+                }),
+
+                [menuKey]: createBlock({
+                    opcode: BlockOpCode.LooksBackdrops,
+                    parent: parentID,
+                    fields: {
+                        "BACKDROP": [
+                            callExpression.arguments[0].type == "StringLiteral" && callExpression.arguments[0].value || "",
+                            null
+                        ]
+                    }
+                })
+            })
+        })
+    }),
+
     nextCostume: createFunction({
         minArgs: 0,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {

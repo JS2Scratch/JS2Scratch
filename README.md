@@ -283,6 +283,7 @@ looks.think(message: string);
 looks.sayForSeconds(message: string, time: number);
 looks.switchCostumeTo(costume: string);
 looks.switchBackdropTo(backdrop: string);
+looks.switchBackdropToAndWait(backdrop: string);
 looks.nextCostume();
 looks.previousCostume();
 looks.nextBackdrop();
