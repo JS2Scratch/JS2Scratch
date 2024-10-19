@@ -255,7 +255,7 @@ for (i; i < 10) // Defaults to "i++";
 
 ### Switch statements
 
-`switch statements`, in the final build, are compiled to `if statements`, so it's recomended you use `if statements` instead them! `switch statements` still work as normal. `break` is not necessary as the code won't flow through, so you can ommit it from your code.
+`switch statements`, in the final build, are compiled to `if statements`, so it's recomended you use `if statements` instead of them! `switch statements` still work as normal. `break` is not necessary as the code won't flow through, so you can ommit it from your code.
 
 ```js
 switch(foo)
