@@ -10,13 +10,15 @@
 *
 /******************************************************************/
 
-import { ArrayExpression, CallExpression, StringLiteral } from "@babel/types";
+import { ArrayExpression, BooleanLiteral, CallExpression, StringLiteral } from "@babel/types";
 import { BlockOpCode, buildData, typeData } from "../../util/types";
 import { BlockCluster, createBlock } from "../../util/blocks";
 import { Error } from "../../util/err";
 import { evaluate } from "../../util/evaluate";
 import { includes, uuid } from "../../util/scratch-uuid";
 import { getBlockNumber, getScratchType, ScratchType } from "../../util/scratch-type";
+import { join } from "path";
+import { readFileSync, writeFileSync } from "fs";
 
 function createFunction(data: {
     minArgs: number,
@@ -50,8 +52,8 @@ function createFunction(data: {
 
 module.exports = {
     newList: createFunction({
-        minArgs: 2,
-        argTypes: ["StringLiteral", "ArrayExpression"],
+        minArgs: 3,
+        argTypes: ["StringLiteral", "ArrayExpression", "BooleanLiteral"],
         doParse: false,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData: buildData) => {
             let listName = (callExpression.arguments[0] as StringLiteral);
@@ -111,6 +113,14 @@ module.exports = {
 
                 ...blocks
             })
+
+            if ((callExpression.arguments[2] as BooleanLiteral).value) {
+                let jsonFile = join(__dirname, "../../assets/lists.json");
+                let content = JSON.parse(readFileSync(jsonFile).toString()) as any[];
+                content.push(listName.value);
+    
+                writeFileSync(jsonFile, JSON.stringify(content));
+            }
         })
     }),
 

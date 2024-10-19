@@ -483,7 +483,11 @@ export async function buildProject(at: string, name: string) {
 
     let srcTree = createFileTree(resolve(src));
 
+    let variableJson = join(__dirname, "../assets/variables.json");
+    let listJson = join(__dirname, "../assets/lists.json");
+   
     spriteData.forEach((value: string) => {
+
         if (value == "stage") {
             error(`cannot create sprite named 'stage'!`);
         }
@@ -618,6 +622,9 @@ export async function buildProject(at: string, name: string) {
 
 
     spriteDatas.forEach((value, index) => {
+        writeFileSync(variableJson, "[]");     
+        writeFileSync(listJson, "[]");     
+
         let spriteName = spriteNames[index];
         let costumes: Costume[] = [];
         let sounds: Sound[] = [];
@@ -651,11 +658,33 @@ export async function buildProject(at: string, name: string) {
             };
         });
 
+        let readVariables = JSON.parse(readFileSync(variableJson).toString()) as any[];
+        let variables: any = {};
+
+        let readLists = JSON.parse(readFileSync(listJson).toString()) as any[];
+        let lists: any = {};
+
+        readVariables.forEach((v, i) => {
+            variables[v] = [
+                v,
+                0
+            ]
+        });
+
+        readLists.forEach((v, i) => {
+            lists[v] = [
+                v,
+                []
+            ]
+        });
+
         let spriteData = value.data;
         physicalSprites.push(
             createSprite({
                 name: spriteName,
                 isStage: spriteName == "stage",
+                variables,
+                lists,
                 blocks,
                 costumes,
                 sounds,

@@ -131,7 +131,7 @@ This program is pretty self-explanitory. It makes the sprite say, "Hello, World!
 
 ## Variables & assignment
 
-All variables are global. If you have a variable and a list with the same name, the `sb3` will not build correctly.
+All variables are global by default. If you have a variable and a list with the same name, the `sb3` will not build correctly.
 
 ```js
 let x = 3; // Valid
@@ -147,6 +147,25 @@ let z = _list_example
 let myStr = "Hello, World!";
 looks.say(myStr);
 ```
+
+You can force a variable to be private by prefixing the name with `_l_`:
+```js
+let _l_test = 5; // local variable "test"
+```
+
+If needed, a global variable can be created by prefixing the name with `_g_`:
+```js
+let _g_test = 5; // global variable "test"
+let _g__l_test = 5; // global variable "_l_test"
+```
+
+Although disabled, a cloud variable can be created by prefixing the name with `_c_`:
+```js
+let _c_test = 5; // cloud variable "test"
+```
+
+> [!WARNING]
+> Cloud variables are currently disabled. They will be converted to a `global` variable instead, and the `_c_` prefix will be removed.
 
 ## Logical expressions
 
@@ -358,7 +377,7 @@ operation.stringContains(stringA: string, stringB: string);
 variable.show(name: string);
 variable.hide(name: string);
 
-list.newList(name: string);
+list.newList(name: string, content: any[], isPrivate: boolean);
 list.push(list: string, value: any);
 list.pop(list: string);
 list.shift(list: string);
