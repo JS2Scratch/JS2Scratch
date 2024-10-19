@@ -167,6 +167,15 @@ let _c_test = 5; // cloud variable "test"
 > [!WARNING]
 > Cloud variables are currently disabled. They will be converted to a `global` variable instead, and the `_c_` prefix will be removed.
 
+> [!CAUTION]
+> Naming a cloud, global, or local variable the same name will cause the build to fail.
+
+These variables are then referenced like normal:
+```js
+let _l_private = "private variable";
+private = "test";
+```
+
 ## Logical expressions
 
 Keep in mind scratch is very strict with logical expressions. In some cases, JS2Scratch will attempt to solve them if they're not allowed in scratch, but it's better to know what the limitations are to avoid errors. A logical operator (`not`, `and`, `or`) can only have 2 possible values on either side. Another spiky block, a logical operator, or a binary operator (such as `<`, and `>`).
@@ -177,12 +186,12 @@ Keep in mind scratch is very strict with logical expressions. In some cases, JS2
 5 + 1 && false // Valid in some cases
 ```
 
-A `not` must be followed by a valid boolean expression (otherwise the entire program will not compile):
-
-```js
-!("hello") // Invalid
-!(5 == 2) // Valid
-```
+> [!CAUTION]
+> A `not` must be followed by a valid boolean expression (otherwise the entire program will not compile):
+> ```js
+> !("hello") // Invalid
+> !(5 == 2) // Valid
+> ```
 
 ## Control flow
 
@@ -453,7 +462,7 @@ turbo_foo("bar");
 
 This function will have a name of `foo`, and will "run without screen refresh".
 
-> [!WARNING]
+> [!CAUTION]
 > Passing too many arguments, or too little, will cause the function to not run at all. The correct amount of arguments, if any, must be passed.
 
 # Event blocks
