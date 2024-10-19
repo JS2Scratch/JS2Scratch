@@ -386,4 +386,137 @@ module.exports = {
             }
         })
     }),
+
+    answer: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
+            let key = uuid(includes.scratch_alphanumeric, 16);
+
+            blockCluster.addBlocks({
+                [key]: createBlock({
+                    opcode: BlockOpCode.SensingAnswer,
+                })
+            });
+
+            return {
+                isStaticValue: true,
+                blockId: key,
+                block: getBlockNumber(key)
+            }
+        })
+    }),
+
+    mouseX: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
+            let key = uuid(includes.scratch_alphanumeric, 16);
+
+            blockCluster.addBlocks({
+                [key]: createBlock({
+                    opcode: BlockOpCode.SensingMouseX,
+                })
+            });
+
+            return {
+                isStaticValue: true,
+                blockId: key,
+                block: getBlockNumber(key)
+            }
+        })
+    }),
+
+    mouseY: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
+            let key = uuid(includes.scratch_alphanumeric, 16);
+
+            blockCluster.addBlocks({
+                [key]: createBlock({
+                    opcode: BlockOpCode.SensingMouseY,
+                })
+            });
+
+            return {
+                isStaticValue: true,
+                blockId: key,
+                block: getBlockNumber(key)
+            }
+        })
+    }),
+
+    loudness: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
+            let key = uuid(includes.scratch_alphanumeric, 16);
+
+            blockCluster.addBlocks({
+                [key]: createBlock({
+                    opcode: BlockOpCode.SensingLoudness,
+                })
+            });
+
+            return {
+                isStaticValue: true,
+                blockId: key,
+                block: getBlockNumber(key)
+            }
+        })
+    }),
+
+    timer: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
+            let key = uuid(includes.scratch_alphanumeric, 16);
+
+            blockCluster.addBlocks({
+                [key]: createBlock({
+                    opcode: BlockOpCode.SensingTimer,
+                })
+            });
+
+            return {
+                isStaticValue: true,
+                blockId: key,
+                block: getBlockNumber(key)
+            }
+        })
+    }),
+
+    daysSince2000: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
+            let key = uuid(includes.scratch_alphanumeric, 16);
+
+            blockCluster.addBlocks({
+                [key]: createBlock({
+                    opcode: BlockOpCode.SensingDaysSince2000,
+                })
+            });
+
+            return {
+                isStaticValue: true,
+                blockId: key,
+                block: getBlockNumber(key)
+            }
+        })
+    }),
+
+    username: createFunction({
+        minArgs: 0,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
+            let key = uuid(includes.scratch_alphanumeric, 16);
+
+            blockCluster.addBlocks({
+                [key]: createBlock({
+                    opcode: BlockOpCode.SensingUsername,
+                })
+            });
+
+            return {
+                isStaticValue: true,
+                blockId: key,
+                block: getBlockNumber(key)
+            }
+        })
+    }),
 }

@@ -384,6 +384,32 @@ pen.setSize(size: number);
 pen.setColor(hex: string);
 ```
 
+#### Special constants
+
+The following functions are constants:
+
+```js
+motion.x();
+motion.y();
+motion.direction();
+
+looks.size();
+looks.costumeIndex();
+looks.costumeName();
+looks.backdropIndex();
+looks.backdropName();
+
+sound.volume();
+
+sensing.answer();
+sensing.mouseX();
+sensing.mouseY();
+sensing.loudness();
+sensing.timer();
+sensing.daysSince2000();
+sensing.username();
+```
+
 You, the user, can also define your own functions like in normal JS:
 
 ```js
