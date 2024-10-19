@@ -331,9 +331,29 @@ sensing.current(dateType: string);
 math.random(min: number, max: number);
 math.mod(value: number);
 math.round(value: number);
-math.operation(type: string, value: number);
+
+math.operation(type: "abs"     |
+                     "floor"   | 
+                     "ceiling" | 
+                     "sqrt"    | 
+                     "sin"     | 
+                     "cos"     | 
+                     "tan"     | 
+                     "asin"    | 
+                     "atan"    | 
+                     "in"      | 
+                     "log"     | 
+                     "e ^"     | 
+                     "10 ^",
+value: number);
+
 math.pi();
 math.pow(base: number, exponent: number); // This doesn't support negative exponents
+
+operation.join(...string: string);
+operation.getLetterOfString(letter: string, string: string);
+operation.getLengthOfString(string: string);
+operation.stringContains(stringA: string, stringB: string);
 
 variable.show(name: string);
 variable.hide(name: string);
