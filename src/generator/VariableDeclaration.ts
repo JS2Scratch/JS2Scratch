@@ -16,6 +16,8 @@ import { Block, BlockOpCode, buildData, typeData } from "../util/types";
 import { getScratchType, ScratchType } from "../util/scratch-type";
 import { uuid, includes } from "../util/scratch-uuid"
 import { evaluate } from "../util/evaluate";
+import { join } from "path";
+import { readFileSync, writeFileSync } from "fs";
 
 module.exports = ((BlockCluster: BlockCluster, VariableDeclaration: VariableDeclaration, buildData: buildData) => {
 
@@ -24,6 +26,36 @@ module.exports = ((BlockCluster: BlockCluster, VariableDeclaration: VariableDecl
     for (let i = 0; i < VariableDeclaration.declarations.length; i++) {
         let declarations = VariableDeclaration.declarations[i];
         let variableName = (declarations as any).id.name;
+
+        let global = false;
+        let local = false;
+        let cloud = false;
+        if (variableName.startsWith("_g_")) {
+            global = true;
+            variableName = variableName.slice(3);
+            variableName = variableName.slice(3);
+        } else if (variableName.startsWith("_c_")) { 
+            cloud = true;
+            global = true;
+            variableName = variableName.slice(3);
+        } else if (variableName.startsWith("_l_")) {
+            local = true;
+            variableName = variableName.slice(3);
+        } else {
+            global = true
+        }
+
+        if (local) {
+            let jsonFile = join(__dirname, "../assets/variables.json");
+            let content = JSON.parse(readFileSync(jsonFile).toString()) as any[];
+            content.push(variableName);
+
+            writeFileSync(jsonFile, JSON.stringify(content));
+        }
+
+        if (declarations.init != null && declarations.init.type == "NewExpression") {
+            return require('./types/NewExpression')(BlockCluster, VariableDeclaration, declarations.init, buildData, variableName)
+        }
 
         let id = uuid(includes.scratch_alphanumeric, 16);
         let value: typeData | any = (declarations.init != null && declarations.init != undefined)

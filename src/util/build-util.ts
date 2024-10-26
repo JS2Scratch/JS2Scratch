@@ -66,13 +66,13 @@ export function createSound({
     }
 
     const { ext, base } = parse(path);
-    const newFilePath = join(__dirname, '../tmp', base);
+    const newFilePath = join(__dirname, '../tmp/temp_project', base);
 
     copyFileSync(path, newFilePath);
 
     const uuidName = uuid(includes.scratch_alphanumeric);
     const uuidFullName = `${uuidName}${ext}`;
-    const newFilePathWithUUID = join(__dirname, '../tmp', uuidFullName);
+    const newFilePathWithUUID = join(__dirname, '../tmp/temp_project', uuidFullName);
 
     renameSync(newFilePath, newFilePathWithUUID);
 
@@ -101,7 +101,8 @@ export function createSprite({
     size = 100,
     direction = 90,
     draggable = false,
-    rotationStyle = "all around"
+    rotationStyle = "all around",
+    layerOrder = 0,
 }: Partial<Sprite> = {}) {
 
     if (costumes.length == 0) {
@@ -137,6 +138,7 @@ export function createSprite({
         direction,
         draggable,
         rotationStyle,
+        layerOrder
     };
 }
 

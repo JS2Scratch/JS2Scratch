@@ -47,7 +47,7 @@ export class Error {
             console.error(`${" ".repeat(msg.length + 1)}${chalk.blue("│")}`);
             console.error(`${chalk.bold(chalk.blue(msg))} ${chalk.blue("│")} ${errorLine}`);
 
-            let arrowLine = ' '.repeat((position.displayColumn || position.column) - 1) + chalk.red('╭') + chalk.red('─').repeat(position.length - 1) + chalk.red('^');
+            let arrowLine = ' '.repeat(Math.max(1, (position.displayColumn || position.column) - 1)) + chalk.red('╭') + chalk.red('─').repeat(position.length - 1) + chalk.red('^');
             console.error(`${" ".repeat(msg.length + 1)}${chalk.blue("│")} ${arrowLine}`);
 
             if (this.positions.length > 1 && index < this.positions.length - 1) {
@@ -77,5 +77,12 @@ export class Error {
 export function Warn(message: string)
 {
     console.warn(`${chalk.yellow("[Warn]: ")}${message}`);
+    return;
+}
+
+export function FatalErr(message: string)
+{
+    console.error(`${chalk.red("[Fatal]: ")}${message}`);
+    process.exit();
     return;
 }

@@ -45,7 +45,7 @@ module.exports = ((BlockCluster: BlockCluster, UnaryExpression: UnaryExpression,
 
     return {
         isStaticValue: true,
-        blockId: null,
+        blockId: id,
         block: getBlockNumber(id)
     }
 })

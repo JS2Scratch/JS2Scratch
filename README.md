@@ -131,7 +131,7 @@ This program is pretty self-explanitory. It makes the sprite say, "Hello, World!
 
 ## Variables & assignment
 
-All variables are global. If you have a variable and a list with the same name, the `sb3` will not build correctly.
+All variables are global by default. If you have a variable and a list with the same name, the `sb3` will not build correctly.
 
 ```js
 let x = 3; // Valid
@@ -148,6 +148,34 @@ let myStr = "Hello, World!";
 looks.say(myStr);
 ```
 
+You can force a variable to be private by prefixing the name with `_l_`:
+```js
+let _l_test = 5; // local variable "test"
+```
+
+If needed, a global variable can be created by prefixing the name with `_g_`:
+```js
+let _g_test = 5; // global variable "test"
+let _g__l_test = 5; // global variable "_l_test"
+```
+
+Although disabled, a cloud variable can be created by prefixing the name with `_c_`:
+```js
+let _c_test = 5; // cloud variable "test"
+```
+
+> [!WARNING]
+> Cloud variables are currently disabled. They will be converted to a `global` variable instead, and the `_c_` prefix will be removed.
+
+> [!CAUTION]
+> Naming a cloud, global, or local variable the same name will cause the build to fail.
+
+These variables are then referenced like normal:
+```js
+let _l_private = "private variable";
+private = "test";
+```
+
 ## Logical expressions
 
 Keep in mind scratch is very strict with logical expressions. In some cases, JS2Scratch will attempt to solve them if they're not allowed in scratch, but it's better to know what the limitations are to avoid errors. A logical operator (`not`, `and`, `or`) can only have 2 possible values on either side. Another spiky block, a logical operator, or a binary operator (such as `<`, and `>`).
@@ -157,6 +185,13 @@ Keep in mind scratch is very strict with logical expressions. In some cases, JS2
 5 < 2 && true // Valid
 5 + 1 && false // Valid in some cases
 ```
+
+> [!CAUTION]
+> A `not` must be followed by a valid boolean expression (otherwise the entire program will not compile):
+> ```js
+> !("hello") // Invalid
+> !(5 == 2) // Valid
+> ```
 
 ## Control flow
 
@@ -220,7 +255,7 @@ for (i; i < 10) // Defaults to "i++";
 
 ### Switch statements
 
-`switch statements`, in the final build, are compiled to `if statements`, so it's recomended you use `if statements` instead them! `switch statements` still work as normal. `break` is not necessary as the code won't flow through, so you can ommit it from your code.
+`switch statements`, in the final build, are compiled to `if statements`, so it's recomended you use `if statements` instead of them! `switch statements` still work as normal. `break` is not necessary as the code won't flow through, so you can ommit it from your code.
 
 ```js
 switch(foo)
@@ -250,6 +285,166 @@ let x = operation.join("Hello, ", "World!"); // Works
 operation.join("Hello, ", "World!"); // Unknown library "operation", Unknown function "join"
 ```
 
+Here is a list of all functions:
+```js
+motion.move(steps: number);
+motion.turnRight(degrees: number);
+motion.turnLeft(degrees: number);
+motion.turnRight(degrees: number);
+motion.gotoXY(X: number, Y: number);
+motion.goto(object: string);
+motion.glide(time: number, X: number, Y: number);
+motion.glideTo(time: number, object: string);
+motion.point(direction: number);
+motion.pointTowards(direction: string);
+motion.changeX(value: string);
+motion.setX(value: string);
+motion.changeY(value: string);
+motion.setY(value: string);
+motion.bounceOnEdge();
+motion.setRotationStyle(value: string);
+
+looks.sayForSeconds(message: string, time: number);
+looks.say(message: string);
+looks.thinkForSecs(message: string, time: number);
+looks.think(message: string);
+looks.sayForSeconds(message: string, time: number);
+looks.switchCostumeTo(costume: string);
+looks.switchBackdropTo(backdrop: string);
+looks.switchBackdropToAndWait(backdrop: string);
+looks.nextCostume();
+looks.previousCostume();
+looks.nextBackdrop();
+looks.previousBackdrop();
+looks.changeSizeBy(factor: number);
+looks.setSizeTo(value: number);
+looks.changeGraphicEffect();
+looks.changeGraphicEffect(type: string, value: number);
+looks.setGraphicEffect(type: string, value: number);
+looks.setLayer(layer: number);
+looks.changeLayer(amount: number);
+looks.show();
+looks.hide();
+
+sound.playSoundUntilDone(sound: string);
+sound.playSound(sound: string);
+sound.stopAllSounds();
+sound.clearEffects();
+sound.changeEffect(type: string, value: number);
+sound.setEffect(type: string, value: number);
+sound.changeVolume(value: number);
+sound.setVolume(value: number);
+
+broadcast.fire(name: string);
+broadcast.fireYield(name: string);
+
+control.wait(length: number);
+control.waitUntil(expression: string); // E.x: control.waitUntil("x < 3");
+control.stop(type: string);
+control.clone();
+control.deleteClone();
+control.heartbeat(length: number);
+
+sensing.ask(question: string);
+sensing.resetTimer();
+sensing.setDragMode(type: string);
+sensing.touching(object: string);
+sensing.touchingColor(hex: string);
+sensing.distanceTo(object: string);
+sensing.mouseDown();
+sensing.keyDown(key: string);
+sensing.itemOfObject(a: string, b: string);
+sensing.current(dateType: string);
+
+math.random(min: number, max: number);
+math.mod(value: number);
+math.round(value: number);
+
+math.operation(type: "abs"     |
+                     "floor"   | 
+                     "ceiling" | 
+                     "sqrt"    | 
+                     "sin"     | 
+                     "cos"     | 
+                     "tan"     | 
+                     "asin"    | 
+                     "atan"    | 
+                     "in"      | 
+                     "log"     | 
+                     "e ^"     | 
+                     "10 ^",
+value: number);
+
+math.pi();
+math.pow(base: number, exponent: number); // This doesn't support negative exponents
+
+operation.join(...string: string);
+operation.getLetterOfString(letter: string, string: string);
+operation.getLengthOfString(string: string);
+operation.stringContains(stringA: string, stringB: string);
+
+variable.show(name: string);
+variable.hide(name: string);
+
+list.newList(name: string, content: any[], isPrivate: boolean);
+list.push(list: string, value: any);
+list.pop(list: string);
+list.shift(list: string);
+list.clear(list: string);
+list.insert(list: string, index: number, value: any);
+list.deleteIndex(list: string, index: number);
+list.replace(list: string, index: number, value: any);
+list.show(list: string);
+list.hide(list: string);
+list.getItem(list: string, index: number);
+list.getItemIndex(list: string, value: any);
+list.length(list: string);
+list.contains(list: string, value: any);
+
+method.cleanup(classname: string); // Deletes all instances of a class
+method.set(class: string, instance: string, property: string, newValue: any); // Sets a property of an instance
+method.destroy(class: string, instance: string);
+
+method.get(class: string, instance: string, property: string); // Gets a property of an instance
+method.instancesOf(class: string); // How many instances of a class currently exist
+
+pen.clear();
+pen.stamp();
+pen.down();
+pen.up();
+pen.changeEffect(type: string, factor: number);
+pen.setEffect(type: string, factor: number);
+pen.changeSize(factor: number);
+pen.setSize(size: number);
+pen.setColor(hex: string);
+```
+
+#### Special constants
+
+The following functions are constants:
+
+```js
+motion.x();
+motion.y();
+motion.direction();
+
+looks.size();
+looks.costumeIndex();
+looks.costumeName();
+looks.backdropIndex();
+looks.backdropName();
+
+sound.volume();
+
+sensing.answer();
+sensing.mouseX();
+sensing.mouseY();
+sensing.loudness();
+sensing.timer();
+sensing.daysSince2000();
+sensing.username();
+```
+
 You, the user, can also define your own functions like in normal JS:
 
 ```js
@@ -274,8 +469,101 @@ turbo_foo("bar");
 
 This function will have a name of `foo`, and will "run without screen refresh".
 
-> [!WARNING]
+> [!CAUTION]
 > Passing too many arguments, or too little, will cause the function to not run at all. The correct amount of arguments, if any, must be passed.
+
+# Classes & Inheritance
+
+> [!CAUTION]
+> Classes are created at compile-time, meaning any modifications at runtime may cause them to break. Classes can be unstable if used incorrectly. Classes also don't automatically deconstruct themselves, so you must do that manually or they will not remove themselves (this means even when you restart the game, the old classes will exist).
+
+A class can be created like in normal JS:
+
+```js
+class Apple {
+    tastinessFactor = 0;
+
+    // There is also an optional constructor
+    constructor() {
+       looks.sayForSeconds("A new apple was created! 😋", 2);
+    }
+
+    eat() {
+        looks.say(
+            operation.join(
+                "The apple has a tastiness factor of: ", tastinessFactor
+            )
+        );
+    }
+}
+```
+
+Again, you can construct a class using the `new` keyword. A class **must** be appended to a variable:
+
+```js
+let myApple = new Apple(); // Creates an "Apple" with name "myApple". 
+myApple.eat();
+
+// Properties cannot be references like "instance.property", but rather by function:
+let appleTastiness = method.get("Apple", "myApple", "tastinessFactor");
+
+// As we cannot read directly from the instance, we can use a function to change a property too:
+method.set("Apple", "myApple", "tastinessFactor", 500);
+
+let apples = method.instancesOf("Apple"); // "1", as only 1 apple exists. If I ran this code
+                                          // multiple times, it would increase as the previous
+                                          // apples have not been destroyed.
+```
+
+As classes aren't cleaned up by default, you may need to use:
+
+```js
+let myApple = new Apple(); // Creates an "Apple" with name "myApple". 
+myApple.eat();
+
+method.destroy("Apple", "myApple"); // Destroys specifically "myApple" of the "Apple" class
+method.cleanup("Apple")l // Destroys all instances of "Apple"
+```
+
+## Inheritance
+
+All inheritance does is "inherit" properties and functions from other classes. For example:
+```js
+class Fruit {
+    color = "RED";
+}
+
+class Apple extends Fruit {
+    tastinessFactor = 0;
+
+    // There is also an optional constructor
+    constructor() {
+       looks.sayForSeconds("A new apple was created! 😋", 2);
+    }
+
+    eat() {
+        looks.say(
+            operation.join(
+                "The apple with the color: '", color, "' has a tastiness factor of: ", tastinessFactor
+            )
+        );
+    }
+}
+
+let myApple = new Apple(); // "A new apple was created! 😋"
+method.set("Apple", "myApple", "tastinessFactor", 15);
+method.set("Apple", "myApple", "color", "green");
+
+myApple.eat(); // "The apple with the color: 'green' has a tastiness factor of: 15"
+```
+
+The `super` keyword has not been implemented and is not planned.
+
+## Why use classes?
+
+As mentioned, classes are very unstable. A class is actually just a fixed space in an array, and any modifications to that array; and the whole class could be corrupted. Since classes don't deconstruct themselves too, it is up to you to figure out when that needs to happen.
+
+Classes are also quite slow when calling methods as every property also has to be passed through (WITH the arguments of that function too). A "procedual" approach would most likely be better as that is what scratch is designed for.
 
 # Event blocks
 

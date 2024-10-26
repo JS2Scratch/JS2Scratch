@@ -19,7 +19,8 @@ import { Error, ErrorPosition, Warn } from "../util/err";
 import chalk from "chalk";
 import { existsSync } from "fs";
 import { join } from "path";
-import { getScratchType, ScratchType } from "../util/scratch-type";
+import { getScratchType, getVariable, ScratchType } from "../util/scratch-type";
+import { includes, uuid } from "../util/scratch-uuid";
 
 function extractSubstringFromCode(code: string, line: number) {
     const lines = code.split('\n');
@@ -30,7 +31,7 @@ function extractSubstringFromCode(code: string, line: number) {
 
 type ParsedFunctionCall = {
     node: string;
-    args: (number | string | boolean)[];
+    args: ({ type: ScratchType, value: any })[]
 };
 
 let KEYS = [
@@ -91,17 +92,18 @@ function parseFunctionCall(str: string): ParsedFunctionCall {
     let node = match[1];
 
     const argsString = match[2].trim();
-    let args: (number | string | boolean)[] = [];
-
+    let args: ({ type: ScratchType, value: any })[] = [];
+    
     if (argsString) {
         args = argsString.split(/,(?![^[]*]|[^()]*\)|[^{}]*})/).map(arg => {
             arg = arg.trim();
-            if (arg === "true") return true;
-            if (arg === "false") return false;
-            if (!isNaN(Number(arg))) return Number(arg);
-            if (arg.startsWith('"') && arg.endsWith('"')) return arg.slice(1, -1);
-            if (arg.startsWith("'") && arg.endsWith("'")) return arg.slice(1, -1);
-            return arg;
+            if (arg === "true") return { value: 1, type: ScratchType.number };
+            if (arg === "false") return { value: 0, type: ScratchType.number };
+            if (!isNaN(Number(arg))) return { value: Number(arg), type: ScratchType.number };
+            if (arg.startsWith('"') && arg.endsWith('"')) return { value: arg.slice(1, -1), type: ScratchType.string };
+            if (arg.startsWith("'") && arg.endsWith("'")) return { value: arg.slice(1, -1), type: ScratchType.string };
+            
+            return { value: arg, type: ScratchType.variable };
         });
     }
 
@@ -147,6 +149,8 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
     }
 
     let blockCluster = new BlockCluster();
+
+    let initHat = uuid(includes.scratch_alphanumeric, 16);
     if (includeHat) {
         let initBlock = createBlock({
             topLevel: true
@@ -155,12 +159,13 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
         if (file && file.comments && file.comments.length != 0) {
             let directiveComment = file.comments[0];
             let commentSrc = directiveComment.value;
+
+            
     
             if (commentSrc.substring(0, 1) == "#") {
                 commentSrc = commentSrc.substring(1);
     
                 let parsedFunc = parseFunctionCall(commentSrc);
-    
                 switch (parsedFunc.node) {
                     case BlockOpCode.EventWhenThisSpriteClicked:
                         initBlock.opcode = BlockOpCode.EventWhenThisSpriteClicked;
@@ -172,7 +177,7 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
     
                     case BlockOpCode.EventWhenKeyPressed:
                         let arg;
-                        if (!parsedFunc.args || !KEYS.includes(arguments[0])) {
+                        if (!parsedFunc.args || !KEYS.includes(parsedFunc[0])) {
                             arg = "space";
                         } else {
                             arg = parsedFunc.args[0];
@@ -184,28 +189,39 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
     
                     case BlockOpCode.EventWhenBackdropSwitchesTo:
                         initBlock.opcode = BlockOpCode.EventWhenBackdropSwitchesTo;
-                        initBlock.fields = { "BACKDROP": [arguments[0] || "backdrop1"] };
+                        initBlock.fields = { "BACKDROP": [parsedFunc[0] || "backdrop1"] };
                         break;
     
                     case BlockOpCode.EventWhenGreaterThan:
-                        let firstArg = String(parsedFunc.args[0]).toUpperCase();
+                        let firstArg = parsedFunc.args[0];
                         let secondArg = parsedFunc.args[1];
-    
-                        if (!firstArg || firstArg != "LOUDNESS" && firstArg != "TIMER") {
-                            firstArg = "LOUDNESS";
+
+                        if (firstArg) firstArg.value = (firstArg.value as string).toUpperCase();
+                        if (!firstArg || firstArg.type != ScratchType.string || firstArg.type == ScratchType.string && (!["LOUDNESS", "TIMER"].includes(firstArg.value))) {
+                            firstArg = {
+                                type: ScratchType.string,
+                                value: "LOUDNESS"
+                            };
+                        }
+
+                        let argC: any = null;
+                        if (secondArg.type != ScratchType.variable) {
+                            argC = getScratchType(secondArg.type, secondArg.value);
+                        } else {
+                            argC = getVariable(secondArg.value);
                         }
     
-                        if (!secondArg || typeof (secondArg) != "number") secondArg = 0;
-    
                         initBlock.opcode = BlockOpCode.EventWhenGreaterThan;
-                        initBlock.inputs = { "VALUE": getScratchType(ScratchType.number, secondArg) };
-                        initBlock.fields = { "WHENGREATERTHANMENU": [firstArg] };
+                        initBlock.inputs = { "VALUE": argC };
+                        initBlock.fields = { "WHENGREATERTHANMENU": [firstArg.value] };
                         break;
     
                     case BlockOpCode.EventWhenBroadcastReceived:
-                        let msgArg = parsedFunc.args[0];
-                        if (!msgArg || typeof (msgArg) != "string") {
+                        let msgArg: any = parsedFunc.args[0];
+                        if (!msgArg || msgArg.type != ScratchType.string) {
                             msgArg = "message1";
+                        } else {
+                            msgArg = msgArg.value
                         }
     
                         initBlock.opcode = BlockOpCode.EventWhenBroadcastReceived;
@@ -216,11 +232,12 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
         }
 
         blockCluster.addBlocks({
-            ["_init"]: initBlock
+            [initHat]: initBlock
         });
     }
 
-    let lastKey = includeHat && "_init" || null;
+    let lastKey = includeHat && initHat || null;
+
     for (let i = 0; i < program.length; i++) {
         let fileData = join(__dirname, "../", `generator/${program[i].type}`);
         if (program[i].type == "EmptyStatement") continue;

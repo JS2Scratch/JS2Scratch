@@ -32,7 +32,7 @@ module.exports = ((BlockCluster: BlockCluster, BooleanLiteral: BooleanLiteral, P
 
     return {
         isStaticValue: true,
-        blockId: null,
+        blockId: key,
         block: getBlockNumber(key)
     }
 })

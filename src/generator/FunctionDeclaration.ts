@@ -38,6 +38,8 @@ module.exports = ((BlockCluster: BlockCluster, FunctionDeclaration: FunctionDecl
         (FunctionDeclaration as any).id.name = (FunctionDeclaration as any).id.name.substring(6);
     }
 
+    let nbd = JSON.parse(JSON.stringify(buildData));
+
     for (let i = 0; i < FunctionDeclaration.params.length; i++)
     {
         let arg = FunctionDeclaration.params[i];
@@ -66,8 +68,8 @@ module.exports = ((BlockCluster: BlockCluster, FunctionDeclaration: FunctionDecl
         blockIds += `"${inputCodes[i]}"${hasNext && "," || ""}`;
         argNames += `"${(arg as any).name}"${hasNext && "," || ""}`;
 
-        buildData.packages.globals = [
-            ...buildData.packages.globals,
+        nbd.packages.globals = [
+            ...nbd.packages.globals,
             createGlobal((arg as any).name, ((BlockCluster: BlockCluster) => {
                 let newId = uuid(includes.scratch_alphanumeric, 16);
 
@@ -88,12 +90,14 @@ module.exports = ((BlockCluster: BlockCluster, FunctionDeclaration: FunctionDecl
                 }
             }))
         ];
+
     }
 
     blockIds += "]";
     argNames += "]";
 
-    let body = parseProgram(FunctionDeclaration.body, FunctionDeclaration.loc?.filename || "", false, buildData.packages);
+    
+    let body = parseProgram(FunctionDeclaration.body, FunctionDeclaration.loc?.filename || "", false, nbd.packages);
 
     BlockCluster.addBlocks({
         [IDs[0]]: createBlock({

@@ -40,6 +40,9 @@ function createProjectContents(name: string, in_folder: string) {
                 volume: 100,
                 visible: true,
                 currentCostume: 0,
+                layerOrder: 0,
+                privateVariables: [],
+                privateLists: {}
             }, null, 2)),
 
             new DirectoryBuffer("sound").Append([
@@ -56,6 +59,9 @@ function createProjectContents(name: string, in_folder: string) {
             new FileBuffer("stage.json", JSON.stringify({
                 volume: 100,
                 currentCostume: 0,
+
+                globalVariables: [],
+                globalLists: [],
             })),
 
             new DirectoryBuffer("sound").Append([
@@ -172,7 +178,7 @@ function validatePropSchema(objects: any, basePath: string, name: string, type: 
                 throw new Error(`${name}: not a file: '${basename(fullPath)}'`);
             }
 
-            costumes.push({ name: obj.name, file: fullPath });
+            costumes.push({ name: obj.name, file: fullPath, x: obj.x || 0, y: obj.y || 0 });
         });
     } catch (err: any) {
         error(err.message);
@@ -376,8 +382,7 @@ export async function buildProject(at: string, name: string) {
     }
 
     let bt = toml.parse(readFileSync(join(at, "Berry.toml")).toString())
-    if (!bt.package || bt.package && (bt.package as any).type != "project")
-    {
+    if (!bt.package || bt.package && (bt.package as any).type != "project") {
         error("this is not a `berry` project!");
     }
 
@@ -404,6 +409,12 @@ export async function buildProject(at: string, name: string) {
     }
 
     await updateDep(lib, join(at, "Berry.toml"));
+
+    let broadcastJson = join(__dirname, "../assets/broadcasts.json");
+    writeFileSync(broadcastJson, "[]");
+
+    let classJson = join(__dirname, "../assets/classData.json");
+    writeFileSync(classJson, "{}");
 
     let sprites: string[] = readdirSync(assets);
     let libraries: string[] = readdirSync(lib);
@@ -480,7 +491,11 @@ export async function buildProject(at: string, name: string) {
 
     let srcTree = createFileTree(resolve(src));
 
+    let variableJson = join(__dirname, "../assets/variables.json");
+    let listJson = join(__dirname, "../assets/lists.json");
+   
     spriteData.forEach((value: string) => {
+
         if (value == "stage") {
             error(`cannot create sprite named 'stage'!`);
         }
@@ -552,7 +567,7 @@ export async function buildProject(at: string, name: string) {
             error(`the 'stage' must have a 'stage.json' which should be a file`);
         }
 
-        stageData.data = JSON.stringify(readFileSync(stageJson).toString(), null, 2);
+        stageData.data = JSON.parse(readFileSync(stageJson).toString());
 
         let stageFolder = readdirSync(stageDir)
         if (stageFolder.includes("backdrops")) {
@@ -613,22 +628,28 @@ export async function buildProject(at: string, name: string) {
     let spriteNames = Object.keys(collectedSpriteData);
     let physicalSprites: Sprite[] = [];
 
+
     spriteDatas.forEach((value, index) => {
+        writeFileSync(variableJson, "[]");     
+        writeFileSync(listJson, "[]");     
+
         let spriteName = spriteNames[index];
         let costumes: Costume[] = [];
         let sounds: Sound[] = [];
         let blocks: any = {};
 
-        (value.costumes as any[]).forEach((value: { [key: string]: string }, index) => {
+        (value.costumes as any[]).forEach((value: { [key: string]: string }) => {
             costumes.push(
                 createCostume({
                     name: value.name,
-                    path: value.file
+                    path: value.file,
+                    rotationCenterX: value.x as any,
+                    rotationCenterY: value.y as any
                 })
             );
         });
 
-        (value.sounds as any[]).forEach((value: { [key: string]: string }, index) => {
+        (value.sounds as any[]).forEach((value: { [key: string]: string }) => {
             sounds.push(
                 createSound({
                     name: value.name,
@@ -637,7 +658,7 @@ export async function buildProject(at: string, name: string) {
             );
         });
 
-        (value.blocks as any[]).forEach((file: string, index) => {
+        (value.blocks as any[]).forEach((file: string) => {
             let content = readFileSync(file).toString();
             blocks = {
                 ...blocks,
@@ -645,11 +666,58 @@ export async function buildProject(at: string, name: string) {
             };
         });
 
+        let readVariables = JSON.parse(readFileSync(variableJson).toString()) as any[];
+        let variables: any = {};
+
+        let readLists = JSON.parse(readFileSync(listJson).toString()) as any[];
+        let lists: any = {};
+
+        readVariables.forEach((v, i) => {
+            variables[v] = [
+                v,
+                0
+            ]
+        });
+
+        readLists.forEach((v, i) => {
+            lists[v] = [
+                v,
+                []
+            ]
+        });
+
         let spriteData = value.data;
+        let variablesData: string[] = spriteData.privateVariables || [];
+        let listsData: string[] = spriteData.privateLists || [];
+ 
+        variablesData.forEach(element => {
+            variables[element] = [element, 0]
+        });
+
+        listsData.forEach(element => {
+            lists[element] = [element, []]
+        });
+
+        if (spriteName == "stage") {
+            let empty: any[] = spriteData.globalVariables || [];
+            let emptyLists: any = spriteData.globalLists || {};
+
+            empty.forEach((j) => {
+                variables[j] = [j, 0]
+            });
+
+            let listKeys = Object.entries(emptyLists);
+            listKeys.forEach(element => {
+                lists[element[0]] = [element[0], element[1]]
+            });
+        }
+
         physicalSprites.push(
             createSprite({
                 name: spriteName,
                 isStage: spriteName == "stage",
+                variables,
+                lists,
                 blocks,
                 costumes,
                 sounds,
@@ -660,10 +728,24 @@ export async function buildProject(at: string, name: string) {
                 direction: spriteData.direction,
                 volume: spriteData.volume,
                 visible: spriteData.visible,
-                currentCostume: spriteData.currentCostume
+                currentCostume: spriteData.currentCostume,
+                layerOrder: spriteData.layerOrder
             })
         );
     })
+
+    let broadcastData = JSON.parse(readFileSync(broadcastJson).toString()) as string[];
+    let broadcasts: any = {};
+
+    broadcastData.forEach((v) => {
+        broadcasts[v] = v;
+    })
+
+    physicalSprites.forEach((v) => {
+        if (v.isStage) {
+            v.broadcasts = broadcasts;
+        }
+    });
 
     let project: Project = {
         targets: physicalSprites,

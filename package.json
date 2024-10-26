@@ -1,6 +1,6 @@
 {
   "name": "js2scratch",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Allows for conversion of a JS project into a SB3 project",
   "main": "src/index.js",
   "bin": {

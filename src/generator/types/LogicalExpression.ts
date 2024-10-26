@@ -76,6 +76,7 @@ module.exports = ((BlockCluster: BlockCluster, LogicalExpression: LogicalExpress
                 && isSpikyType((LogicalExpression as any).left.callee.object.name, (LogicalExpression as any).left.callee.property.name))
             && LogicalExpression.left.type != "LogicalExpression"
             && LogicalExpression.left.type != "BooleanLiteral"
+            && LogicalExpression.left.type != "UnaryExpression"
             && !(LogicalExpression.left.type == "BinaryExpression"
                 && isComparisonOperator(LogicalExpression.left.operator))) {
             let loc = (LogicalExpression.left.loc as SourceLocation);
@@ -95,6 +96,7 @@ module.exports = ((BlockCluster: BlockCluster, LogicalExpression: LogicalExpress
                 && isSpikyType((LogicalExpression as any).right.callee.object.name, (LogicalExpression as any).right.callee.property.name))
             && LogicalExpression.right.type != "LogicalExpression"
             && LogicalExpression.right.type != "BooleanLiteral"
+            && LogicalExpression.right.type != "UnaryExpression"
             && !(LogicalExpression.right.type == "BinaryExpression"
                 && isComparisonOperator(LogicalExpression.right.operator))) {
             let loc = (LogicalExpression.right.loc as SourceLocation);
@@ -127,7 +129,7 @@ module.exports = ((BlockCluster: BlockCluster, LogicalExpression: LogicalExpress
 
     return {
         isStaticValue: true,
-        blockId: null,
+        blockId: id,
         block: getBlockNumber(id)
     }
 })

@@ -18,7 +18,6 @@ import { getBlockNumber, getVariable } from "../util/scratch-type";
 import { evaluate } from "../util/evaluate";
 
 module.exports = ((BlockCluster: BlockCluster, AssignmentExpression: AssignmentExpression, buildData: buildData) => {
-
     let keysGenerated: string[] = [];
     let ID = uuid(includes.scratch_alphanumeric, 16);
 
@@ -45,12 +44,6 @@ module.exports = ((BlockCluster: BlockCluster, AssignmentExpression: AssignmentE
 
             break;
         case "+=":
-        case "-=":
-            if (AssignmentExpression.operator == "-=") {
-                let value = newValue.block[1][1];
-                newValue.block[1][1] = String(-parseFloat(value) || "");
-            }
-
             BlockCluster.addBlocks({
                 [ID]: createBlock({
                     opcode: BlockOpCode.DataChangeVariableBy,
@@ -70,6 +63,7 @@ module.exports = ((BlockCluster: BlockCluster, AssignmentExpression: AssignmentE
 
         case "*=":
         case "/=":
+        case "-=":
             let id = uuid(includes.scratch_alphanumeric);
 
             BlockCluster.addBlocks({
@@ -88,7 +82,9 @@ module.exports = ((BlockCluster: BlockCluster, AssignmentExpression: AssignmentE
                 }),
 
                 [id]: createBlock({
-                    opcode: AssignmentExpression.operator == "*=" ? BlockOpCode.OperatorMultiply : BlockOpCode.OperatorDivide,
+                    opcode: AssignmentExpression.operator == "*=" ? BlockOpCode.OperatorMultiply :
+                            AssignmentExpression.operator == "/=" ? BlockOpCode.OperatorDivide :
+                            BlockOpCode.OperatorSubtract,
                     parent: ID,
                     inputs: {
                         "NUM1": getVariable((AssignmentExpression as any).left.name),

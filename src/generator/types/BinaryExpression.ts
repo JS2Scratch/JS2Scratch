@@ -76,7 +76,7 @@ module.exports = ((BlockCluster: BlockCluster, BinaryExpression: BinaryExpressio
 
     return {
         isStaticValue: true,
-        blockId: null,
+        blockId: id,
         block: getBlockNumber(id)
     }
 })

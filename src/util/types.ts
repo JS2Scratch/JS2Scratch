@@ -316,7 +316,8 @@ export interface Sprite {
     size: number,
     direction: number,
     draggable: boolean,
-    rotationStyle: "all around"
+    rotationStyle: "all around",
+    layerOrder?: number
 }
 
 
@@ -358,7 +359,7 @@ export interface typeData {
 export interface buildData {
     instruction: number,
     originalSource: string,
-    packages: {[key: string]: any}
+    packages: {[key: string]: any},
 }
 
 export interface generatedData {

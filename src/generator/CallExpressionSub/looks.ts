@@ -112,25 +112,13 @@ module.exports = {
         minArgs: 1,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
 
-            let menuKey = uuid(includes.scratch_alphanumeric, 16);
             blockCluster.addBlocks({
                 [parentID]: createBlock({
                     opcode: BlockOpCode.LooksSwitchCostumeTo,
                     inputs: {
-                        "COSTUME": getMenu(menuKey),
+                        "COSTUME": parsedArguments[0].block,
                     }
                 }),
-
-                [menuKey]: createBlock({
-                    opcode: BlockOpCode.LooksCostume,
-                    parent: parentID,
-                    fields: {
-                        "COSTUME": [
-                            callExpression.arguments[0].type == "StringLiteral" && callExpression.arguments[0].value || "",
-                            null
-                        ]
-                    },
-                })
             })
         })
     }),
@@ -139,11 +127,25 @@ module.exports = {
     switchBackdropTo: createFunction({
         minArgs: 1,
         body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
+            blockCluster.addBlocks({
+                [parentID]: createBlock({
+                    opcode: BlockOpCode.LooksSwitchBackdropTo,
+                    inputs: {
+                        "BACKDROP": parsedArguments[0].block,
+                    }
+                }),
+            })
+        })
+    }),
+
+    switchBackdropToAndWait: createFunction({
+        minArgs: 1,
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string) => {
 
             let menuKey = uuid(includes.scratch_alphanumeric, 16);
             blockCluster.addBlocks({
                 [parentID]: createBlock({
-                    opcode: BlockOpCode.LooksSwitchBackdropTo,
+                    opcode: BlockOpCode.LooksSwitchBackdropToAndWait,
                     inputs: {
                         "BACKDROP": getMenu(menuKey),
                     }

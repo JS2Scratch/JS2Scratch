@@ -19,6 +19,11 @@ import { Error } from "../../util/err";
 import { evaluate } from "../../util/evaluate";
 import * as babel from "@babel/parser";
 
+function isComparisonOperator(value: string) {
+    const operators = [">", "<", "==", "===", "!=", "!=="];
+    return operators.includes(value);
+}
+
 function createFunction(data: {
     minArgs: number,
     body: (parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, parentID: string, buildData: buildData) => void
@@ -64,34 +69,50 @@ module.exports = {
                 firstArg = stringLiteral("");
             }
 
+            // isSpikyType((LogicalExpression as any).right.callee.object.name, (LogicalExpression as any).right.callee.property.name))
+            // &&
+            //     && isComparisonOperator(babelParsed.operator))
+
+
             let babelParsed = babel.parseExpression(firstArg.value)
             let extra: { [key: string]: any } = {};
             let id = uuid(includes.scratch_alphanumeric, 16);
             let evaluated: any;
-            if (babelParsed.type != "LogicalExpression") {
-                if (babelParsed.type == "BinaryExpression" && ["<", ">", "==", "===", "!=", "!=="].includes(babelParsed.operator)) {
-                    let sId = uuid(includes.scratch_alphanumeric, 16)
-                    extra[sId] = createBlock({
-                        opcode: BlockOpCode.OperatorEquals,
-                        parent: id,
-                        inputs: {
-                            "OPERAND1": evaluated,
-                            "OPERAND2": getScratchType(ScratchType.number, "1")
-                        }
-                    });
 
-                    evaluated = getBlockNumber(sId);
-                } else {
-                    new Error(
-                        "Cannot resolve logical expression",
-                        firstArg.value == "" && "No Logical expression was provided!" || firstArg.value,
-                        [{ line: callExpression.arguments[0].loc?.start.line || 1, column: callExpression.arguments[0].loc?.start.column || 1, length: firstArg.value.length, displayColumn: 1 }],
-                        callExpression.loc?.filename || ""
-                    ).displayError()
-                }
-            } else {
-                evaluated = evaluate(babelParsed.type, blockCluster, babelParsed, id, buildData).block;
+            if (
+                babelParsed.type != "LogicalExpression" &&
+                babelParsed.type != "BooleanLiteral" &&
+                !(babelParsed.type == "BinaryExpression" && isComparisonOperator(babelParsed.operator)) &&
+                !(babelParsed.type == "UnaryExpression" && babelParsed.operator == "!")
+            ) {
+                new Error(
+                    "Cannot resolve logical expression",
+                    firstArg.value == "" && "No Logical expression was provided!" || firstArg.value,
+                    [{ line: callExpression.arguments[0].loc?.start.line || 1, column: callExpression.arguments[0].loc?.start.column || 1, length: firstArg.value.length, displayColumn: 1 }],
+                    callExpression.loc?.filename || ""
+                ).displayError()
             }
+
+            evaluated = evaluate(babelParsed.type, blockCluster, babelParsed, id, buildData).block;
+
+            // if (babelParsed.type == "LogicalExpression" || babelParsed.type == "BooleanLiteral") {
+            //     evaluated = evaluate(babelParsed.type, blockCluster, babelParsed, id, buildData).block;
+            // } else if (babelParsed.type == "BinaryExpression") {
+            //     let sId = uuid(includes.scratch_alphanumeric, 16)
+            //     extra[sId] = createBlock({
+            //         opcode: BlockOpCode.OperatorEquals,
+            //         parent: id,
+            //         inputs: {
+            //             "OPERAND1": evaluated,
+            //             "OPERAND2": getScratchType(ScratchType.number, "1")
+            //         }
+            //     });
+
+            //     evaluated = getBlockNumber(sId);
+            // } else if (babelParsed.type == "UnaryExpression") {
+            //     let sId = uuid(includes.scratch_alphanumeric, 16)
+                
+            // }
 
             blockCluster.addBlocks({
                 [parentID]: createBlock({
@@ -180,7 +201,7 @@ module.exports = {
                 })
             })
 
-            return { terminate: firstArg != "other scripts in sprite" }
+            return {  }
         })
     }),
 
