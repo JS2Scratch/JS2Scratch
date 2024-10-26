@@ -23,7 +23,7 @@ export enum ScratchType {
     list = 13
 }
 
-type ScratchInput = [number, ([ScratchType, any, string?, string?] | string)?, [ScratchType, any]?];
+export type ScratchInput = [number, ([ScratchType, any, string?, string?] | string)?, [ScratchType, any]?];
 
 function getSubstack(startIndex: string): ScratchInput {
     return [

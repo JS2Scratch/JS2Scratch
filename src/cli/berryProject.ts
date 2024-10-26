@@ -22,6 +22,8 @@ import { parseProgram } from "../env/parseProgram";
 import { userInfo } from "os";
 import { execFileSync } from "child_process";
 import * as toml from "@iarna/toml";
+import { treeOptimise } from "../packages/tree-optimise/index"
+import { Warn } from "../util/err";
 
 function createProjectContents(name: string, in_folder: string) {
     new FileBuffer("Berry.toml", `[package]\nname = '${name}'\ntype = 'project'\n\n[dependencies]\n`).Instantiate(in_folder);
@@ -119,6 +121,10 @@ function warn(string: string) {
 
 function info(green: string, string: string) {
     console.log(chalk.green(chalk.bold(green)) + string);
+}
+
+function infoList(depth: number, green: string, string: string) {
+    console.log(chalk.gray(" ".repeat(depth) + "- ") + chalk.green(chalk.bold(green)) + string);
 }
 
 function berryObjectExistsAt(path: string) {
@@ -372,12 +378,18 @@ export async function addDep(libraries: { [key: string]: any }) {
 }
 
 function optimiseTree(program: {[key: string]: Block}): {[key: string]: Block} {
-    return program;
+    return treeOptimise(program);
 }
 
 export async function buildProject(argv: {[key: string]: any}, at: string, name: string) {
+    let tags: string[] = [];
     let isOptimised = argv.optimize == true;
+
+    if (isOptimised) Warn("Optimization is still in its ALPHA form and may corrupt your project.");
+
     info("Building ", name);
+
+    tags.push(isOptimised && "[optimized]" || "[unoptimized]")
 
     let libFolder = join(__dirname, "../util/lib");
     deleteAllContents(libFolder);
@@ -662,7 +674,8 @@ export async function buildProject(argv: {[key: string]: any}, at: string, name:
                 })
             );
         });
-
+        
+        if (isOptimised) infoList(1, "Optimizing ", spriteName);
         (value.blocks as any[]).forEach((file: string) => {
             let content = readFileSync(file).toString();
             let program = parseProgram(content, basename(file), true, config).blocks;
@@ -787,7 +800,7 @@ export async function buildProject(argv: {[key: string]: any}, at: string, name:
     copyAllSync(tempParentLocation, join(at, "target"));
     deleteAllContents(tempParentLocation);
 
-    info("Finished ", `${name} [unoptimized] in ${timeDifference}s`);
+    info("Finished ", `${name} ${tags.join(" ")} in ${timeDifference}s`);
 }
 
 export async function runProject(argv: {[key: string]: any}, at: string, name: string) {

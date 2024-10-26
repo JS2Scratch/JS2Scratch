@@ -11,6 +11,8 @@
 /******************************************************************/
 
 export enum BlockOpCode {
+    JS2Scratch_Unknown = "JS2Scratch_Unknown",
+
     MotionMoveSteps = "motion_movesteps",
     MotionTurnRight = "motion_turnright",
     MotionTurnLeft = "motion_turnleft",

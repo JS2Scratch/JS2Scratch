@@ -48,7 +48,7 @@ function parseIf(Block_Cluster: BlockCluster, IfStatement: IfStatement, buildDat
         }
     }
 
-    let evaluated = evaluate(IfStatement.test.type, Block_Cluster, IfStatement.test, id, buildData);
+    let evaluated = evaluate(IfStatement.test.type, Block_Cluster, IfStatement.test, id, buildData).block;
     let extra: {[key: string]: any} = {};
     if (IfStatement.test.type != "LogicalExpression" && !(IfStatement.test.type == "BinaryExpression" && ["<", ">", "==", "===", "!=", "!=="].includes(IfStatement.test.operator)))
     {
@@ -57,18 +57,16 @@ function parseIf(Block_Cluster: BlockCluster, IfStatement: IfStatement, buildDat
             opcode: BlockOpCode.OperatorEquals,
             parent: id,
             inputs: {
-                "OPERAND1": evaluated.block,
+                "OPERAND1": evaluated,
                 "OPERAND2": getScratchType(ScratchType.number, "1")
             }
         });
 
-        evaluated.block = getSubstack(sId);
-    } else {
-        evaluated.block = getSubstack(evaluated.block[1])
+        evaluated = getBlockNumber(sId);
     }
 
     const commonFields = {
-        "CONDITION": evaluated.block,
+        "CONDITION": evaluated,
         "SUBSTACK": substackA.firstIndex !== undefined ? getSubstack(substackA.firstIndex) : undefined,
         "SUBSTACK2": substackB !== undefined ? getSubstack(substackB.firstIndex) : undefined,
     }

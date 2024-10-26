@@ -522,7 +522,7 @@ let myApple = new Apple(); // Creates an "Apple" with name "myApple".
 myApple.eat();
 
 method.destroy("Apple", "myApple"); // Destroys specifically "myApple" of the "Apple" class
-method.cleanup("Apple")l // Destroys all instances of "Apple"
+method.cleanup("Apple"); // Destroys all instances of "Apple"
 ```
 
 ## Inheritance
