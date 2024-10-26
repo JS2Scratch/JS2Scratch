@@ -16,7 +16,7 @@ import path, { basename, join, resolve } from "path";
 import chalk from "chalk";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "fs";
 import { createFileTree } from "./treeScan";
-import { Costume, Project, Sound, Sprite } from "../util/types";
+import { Block, Costume, Project, Sound, Sprite } from "../util/types";
 import { cloneFolderSync, copyAllSync, createCostume, createSound, createSprite, deleteAllContents, fillDefaults, zipFolderToSb3 } from "../util/build-util";
 import { parseProgram } from "../env/parseProgram";
 import { userInfo } from "os";
@@ -42,7 +42,7 @@ function createProjectContents(name: string, in_folder: string) {
                 currentCostume: 0,
                 layerOrder: 0,
                 privateVariables: [],
-                privateLists: {}
+                privateLists: []
             }, null, 2)),
 
             new DirectoryBuffer("sound").Append([
@@ -371,7 +371,12 @@ export async function addDep(libraries: { [key: string]: any }) {
     })
 }
 
-export async function buildProject(at: string, name: string) {
+function optimiseTree(program: {[key: string]: Block}): {[key: string]: Block} {
+    return program;
+}
+
+export async function buildProject(argv: {[key: string]: any}, at: string, name: string) {
+    let isOptimised = argv.optimize == true;
     info("Building ", name);
 
     let libFolder = join(__dirname, "../util/lib");
@@ -660,9 +665,12 @@ export async function buildProject(at: string, name: string) {
 
         (value.blocks as any[]).forEach((file: string) => {
             let content = readFileSync(file).toString();
+            let program = parseProgram(content, basename(file), true, config).blocks;
+
+            if (isOptimised) program = optimiseTree(program);
             blocks = {
                 ...blocks,
-                ...parseProgram(content, basename(file), true, config).blocks
+                ...program
             };
         });
 
@@ -782,8 +790,8 @@ export async function buildProject(at: string, name: string) {
     info("Finished ", `${name} [unoptimized] in ${timeDifference}s`);
 }
 
-export async function runProject(at: string, name: string) {
-    await buildProject(at, name);
+export async function runProject(argv: {[key: string]: any}, at: string, name: string) {
+    await buildProject(argv, at, name);
     let target = join(at, "target");
     let compiled = join(target, `${name}.sb3`)
 

@@ -85,7 +85,7 @@ yargs(hideBin(process.argv))
             if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
 
             let resolved = resolve(argv.path);
-            return await buildProject(resolved, basename(resolved));
+            return await buildProject(argv, resolved, basename(resolved));
         }
     )
 
@@ -101,9 +101,8 @@ yargs(hideBin(process.argv))
         },
         async (argv) => {
             if (process.platform != "win32" && !argv.bypass) error("js2scratch only works on the windows architecture.");
-
             let resolved = resolve(argv.path);
-            return await runProject(resolved, basename(resolved));
+            return await runProject(argv, resolved, basename(resolved));
         }
     )
 
@@ -222,6 +221,12 @@ yargs(hideBin(process.argv))
         alias: 'b',
         type: 'boolean',
         description: 'Bypass the platform-block on JS2Scratch. May cause errors.',
+    })
+
+    .option('optimize', {
+        alias: 'o',
+        type: 'boolean',
+        description: 'Whether to compile an optimized build or not',
     })
 
     // Parse the command line arguments
