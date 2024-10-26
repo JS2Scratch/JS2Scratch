@@ -1,5 +1,0 @@
-[package]
-name = 'my-project'
-type = 'project'
-
-[dependencies]
