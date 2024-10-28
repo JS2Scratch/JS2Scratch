@@ -12,8 +12,8 @@
 *
 /******************************************************************/
 
-import { BlockCluster, createBlock, isSpiky, isSpikyType } from "../../util/blocks";
-import { CallExpression, isCallExpression, LogicalExpression, SourceLocation } from "@babel/types"
+import { BlockCluster, createBlock, isSpikyType } from "../../util/blocks";
+import { isCallExpression, LogicalExpression, SourceLocation } from "@babel/types"
 import { getBlockNumber } from "../../util/scratch-type"
 import { evaluate } from "../../util/evaluate"
 import { includes, uuid } from "../../util/scratch-uuid";
@@ -51,8 +51,8 @@ const allowsAnyInput: { [key in LogicalOperators]: boolean } = {
     [BlockOpCode.OperatorOr]: false
 };
 
-function isComparisonOperator(value: string) {
-    const operators = [">", "<", "==", "===", "!=", "!=="];
+export function isComparisonOperator(value: string) {
+    const operators = [">", "<", "==", "===", "!=", "!==", "<=", ">="];
     return operators.includes(value);
 }
 

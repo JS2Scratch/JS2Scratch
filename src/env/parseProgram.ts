@@ -123,7 +123,7 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
     let program
     let file;
     let firstIndex = ""
-
+    
     if (typeof (string) == "string") {
         try {
             file = babel.parse(string, { sourceFilename });

@@ -10,14 +10,16 @@
 *
 /******************************************************************/
 
-import { BlockCluster, createBlock } from "../../util/blocks";
-import { BinaryExpression } from "@babel/types"
+import { BlockCluster, createBlock, isSpiky, isSpikyType } from "../../util/blocks";
+import { BinaryExpression, isCallExpression, SourceLocation } from "@babel/types"
 import { getBlockNumber } from "../../util/scratch-type"
 import { evaluate } from "../../util/evaluate"
 import { includes, uuid } from "../../util/scratch-uuid";
 import { BlockOpCode, buildData } from "../../util/types";
+import { Error, ErrorPosition } from "../../util/err";
+import { isComparisonOperator } from "./LogicalExpression";
 
-const operators: {[key: string]: BlockOpCode} = {
+const operators: { [key: string]: BlockOpCode } = {
     "+": BlockOpCode.OperatorAdd,
     "-": BlockOpCode.OperatorSubtract,
     "*": BlockOpCode.OperatorMultiply,
@@ -32,7 +34,7 @@ const operators: {[key: string]: BlockOpCode} = {
     ">": BlockOpCode.OperatorGreaterThan,
 }
 
-const numericalFields: {[key: string]: string} = {
+const numericalFields: { [key: string]: string } = {
     "+": "NUM",
     "-": "NUM",
     "*": "NUM",
@@ -50,33 +52,75 @@ module.exports = ((BlockCluster: BlockCluster, BinaryExpression: BinaryExpressio
     const leftHandSide = evaluate(BinaryExpression.left.type, BlockCluster, BinaryExpression.left, id, buildData);
     const rightHandSide = evaluate(BinaryExpression.right.type, BlockCluster, BinaryExpression.right, id, buildData);
 
-    BlockCluster.addBlocks({
-        [id]: createBlock({
-            opcode: operators[BinaryExpression.operator] || BlockOpCode.OperatorNot,
-            parent: ParentID,
-            inputs: {
-                [numericalFields[BinaryExpression.operator] + "1"]: leftHandSide.block,
-                [numericalFields[BinaryExpression.operator] + "2"]: rightHandSide.block,
-            }
-        })
-    });
+    if (!["<=", ">="].includes(BinaryExpression.operator)) {
+        BlockCluster.addBlocks({
+            [id]: createBlock({
+                opcode: operators[BinaryExpression.operator] || BlockOpCode.OperatorNot,
+                parent: ParentID,
+                inputs: {
+                    [numericalFields[BinaryExpression.operator] + "1"]: leftHandSide.block,
+                    [numericalFields[BinaryExpression.operator] + "2"]: rightHandSide.block,
+                }
+            })
+        });
 
-    if (["!=", "!=="].includes(BinaryExpression.operator))
-    {
-        let oldId = id;
-        id = uuid(includes.scratch_alphanumeric, 16);
-        BlockCluster.blocks[id] = createBlock({
-            opcode: BlockOpCode.OperatorNot,
-            parent: ParentID,
-            inputs: {
-                "OPERAND": getBlockNumber(oldId)
-            }
-        })
-    }
+        if (["!=", "!=="].includes(BinaryExpression.operator)) {
+            let oldId = id;
+            id = uuid(includes.scratch_alphanumeric, 16);
+            BlockCluster.blocks[id] = createBlock({
+                opcode: BlockOpCode.OperatorNot,
+                parent: ParentID,
+                inputs: {
+                    "OPERAND": getBlockNumber(oldId)
+                }
+            })
+        }
 
-    return {
-        isStaticValue: true,
-        blockId: id,
-        block: getBlockNumber(id)
+        return {
+            isStaticValue: true,
+            blockId: id,
+            block: getBlockNumber(id)
+        }
+
+    } else {
+        let smallId = uuid(includes.scratch_alphanumeric, 16);
+        let equalId = uuid(includes.scratch_alphanumeric, 16);
+
+        let rightDouble = evaluate(BinaryExpression.right.type, BlockCluster, BinaryExpression.right, id, buildData);
+
+        BlockCluster.addBlocks({
+            [id]: createBlock({
+                opcode: BlockOpCode.OperatorOr,
+                parent: ParentID,
+                inputs: {
+                    ["OPERAND1"]: getBlockNumber(smallId),
+                    ["OPERAND2"]: getBlockNumber(equalId),
+                }
+            }),
+
+            [smallId]: createBlock({
+                opcode: BinaryExpression.operator == "<=" && BlockOpCode.OperatorLessThan || BlockOpCode.OperatorGreaterThan,
+                parent: id,
+                inputs: {
+                    ["OPERAND1"]: leftHandSide.block,
+                    ["OPERAND2"]: rightHandSide.block,
+                }
+            }),
+
+            [equalId]: createBlock({
+                opcode: BlockOpCode.OperatorEquals,
+                parent: id,
+                inputs: {
+                    ["OPERAND1"]: leftHandSide.block,
+                    ["OPERAND2"]: rightDouble.block,
+                }
+            }),
+        });
+
+        return {
+            isStaticValue: true,
+            blockId: id,
+            block: getBlockNumber(id)
+        }
     }
 })
