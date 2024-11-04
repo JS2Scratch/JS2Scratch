@@ -1,6 +1,6 @@
 /*******************************************************************
 * Copyright         : 2024 saaawdust
-* File Name         : blocks.ts
+* File Name         : parseProgram.ts
 *
 * Description       : Creates a Scratch-AST
 *                    
@@ -177,14 +177,15 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
     
                     case BlockOpCode.EventWhenKeyPressed:
                         let arg;
-                        if (!parsedFunc.args || !KEYS.includes(parsedFunc[0])) {
+                        if (!parsedFunc.args || !KEYS.includes(parsedFunc.args[0].value)) {
                             arg = "space";
                         } else {
-                            arg = parsedFunc.args[0];
+                            arg = parsedFunc.args[0].value;
                         }
     
+                       
                         initBlock.opcode = BlockOpCode.EventWhenKeyPressed;
-                        initBlock.fields = { "KEY_OPTION": arg };
+                        initBlock.fields = { "KEY_OPTION": [arg,null] };
                         break;
     
                     case BlockOpCode.EventWhenBackdropSwitchesTo:
