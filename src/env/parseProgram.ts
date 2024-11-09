@@ -1,6 +1,6 @@
 /*******************************************************************
 * Copyright         : 2024 saaawdust
-* File Name         : blocks.ts
+* File Name         : parseProgram.ts
 *
 * Description       : Creates a Scratch-AST
 *                    
