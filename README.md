@@ -501,7 +501,7 @@ doCode()
 looks.say("Hello!");
 ```
 
-It is also possible to return certain values in syncronous and asyncronous contexts. As scratch cannot return values via functions natively, you must `util.getReturnAddress` to get the returned value:
+It is also possible to return certain values in synchronous  and asynchronous contexts. As scratch cannot return values via functions natively, you must `util.getReturnAddress` to get the returned value:
 
 ```js
 function getPi() {
@@ -513,7 +513,7 @@ getPi();
 let x = util.getReturnAddress("getPi"); // We can now access the value via function
 ```
 
-Although it is a messy approach, it is the best way internally to handle returning until it is supported. As mentioned, you can also return values via asyncronous functions:
+Although it is a messy approach, it is the best way internally to handle returning until it is supported. As mentioned, you can also return values via asynchronous functions:
 
 ```js
 async function getPiAsync() {
@@ -535,21 +535,21 @@ Here is a more complex example using `return`:
 
 ```js
 // We don't yield here, so
-// we keep this as a syncronous
+// we keep this as a synchronous 
 // function.
 function pi() {
     return 3.14149;
 }
 
 // Once again, there is no yielding here,
-// so this is kept as a syncronous function.
+// so this is kept as a synchronous  function.
 function getPi() {
     pi();
     return util.getReturnAddress("pi"); // Return the content of "pi"
 }
 
 // Note that this function
-// doesn't need to be asyncronous, but is
+// doesn't need to be asynchronous, but is
 // for this example.
 async function program() {
     let x = 0; // Reset X
@@ -558,15 +558,15 @@ async function program() {
     x = util.getReturnAddress("getPi"); // Set x to the content of "getPi"
 }
 
-// Run the asyncronous function
+// Run the asynchronous function
 // `program`. Note that this function
-// doesn't need to be asyncronous, but is
+// doesn't need to be asynchronous, but is
 // for this example.
 program();
 ```
 
 > [!CAUTION]
-> There is no implementation for promises, and therefore making one function `await` another asyncronous function causes the code to wait in an infinite loop. Only make functions that return asyncronous if they actually yield the thread. For example:
+> There is no implementation for promises, and therefore making one function `await` another asynchronous  function causes the code to wait in an infinite loop. Only make functions that return asynchronous if they actually yield the thread. For example:
 > ```js
 > async function pi() {
 >   return 3.141
@@ -577,7 +577,7 @@ program();
 >               // `pi` has returned, it starts waiting for the function
 >               // to end (which will never happen, as it has already ended).
 >
->               // If the `pi` function yielded / was syncronous, this would
+>               // If the `pi` function yielded / was synchronous , this would
 >               // work fine.
 > }
 > ```
