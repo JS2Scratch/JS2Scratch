@@ -26,7 +26,7 @@ function extractSubstringFromCode(code: string, line: number) {
     const lines = code.split('\n');
     const targetLine = lines[line - 1];
 
-    return targetLine.substring(6, 21);
+    return targetLine
 }
 
 type ParsedFunctionCall = {
@@ -119,10 +119,19 @@ function parseFunctionCall(str: string): ParsedFunctionCall {
     };
 }
 
-export function parseProgram(string: string | BlockStatement, sourceFilename: string, includeHat: boolean, packageData: { [key: string]: any }) {
+let FILE_CONTENT = ""
+export function parseProgram(string: string | BlockStatement, sourceFilename: string, includeHat: boolean, packageData: { [key: string]: any },  metadata?: { [key: string]: any }) {
     let program
     let file;
     let firstIndex = ""
+
+    if (!metadata) {
+        metadata = {};
+    }
+
+    if (includeHat) {
+        FILE_CONTENT = string as string;
+    }
     
     if (typeof (string) == "string") {
         try {
@@ -138,7 +147,7 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
                     message: "There is a syntax error in your code. Make sure all your code is valid.",
                 };
 
-                new Error(`Babel syntax error: '${error.reasonCode}'`, extractSubstringFromCode(string, error.loc.line), [errorPos], sourceFilename);
+                new Error(`Babel syntax error: '${error.reasonCode}'`, string, [errorPos], sourceFilename);
             }
 
             process.exit();
@@ -177,14 +186,15 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
     
                     case BlockOpCode.EventWhenKeyPressed:
                         let arg;
-                        if (!parsedFunc.args || !KEYS.includes(parsedFunc[0])) {
+                        if (!parsedFunc.args || !KEYS.includes(parsedFunc.args[0].value)) {
                             arg = "space";
                         } else {
-                            arg = parsedFunc.args[0];
+                            arg = parsedFunc.args[0].value;
                         }
     
+                       
                         initBlock.opcode = BlockOpCode.EventWhenKeyPressed;
-                        initBlock.fields = { "KEY_OPTION": arg };
+                        initBlock.fields = { "KEY_OPTION": [arg,null] };
                         break;
     
                     case BlockOpCode.EventWhenBackdropSwitchesTo:
@@ -259,7 +269,7 @@ export function parseProgram(string: string | BlockStatement, sourceFilename: st
             data = require(fileData);
         }
 
-        data = data(blockCluster, program[i], { instruction: i, originalSource: string, packages: packageData });
+        data = data(blockCluster, program[i], { instruction: i, originalSource: FILE_CONTENT, packages: packageData, ...metadata });
         if (!data) continue;
         if (data.err) continue;
         if (data.doNotParent) continue;

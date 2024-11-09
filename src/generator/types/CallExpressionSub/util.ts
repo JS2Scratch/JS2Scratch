@@ -1,22 +1,24 @@
 /*******************************************************************
 * Copyright         : 2024 saaawdust
-* File Name         : looks.ts
-* Description       : Looks library (types)
+* File Name         : util.ts
+* Description       : Utility library (types)
 *                    
 * Revision History  :
 * Date		Author 			Comments
 * ------------------------------------------------------------------
-* 19/10/2024	saaawdust	Initial Creation
+* 09/11/2024	saaawdust	Initial Creation
 *
 /******************************************************************/
 
-import { CallExpression } from "@babel/types";
+import { CallExpression, NumericLiteral, StringLiteral } from "@babel/types";
 import { BlockOpCode, buildData, typeData } from "../../../util/types";
 import { BlockCluster, createBlock } from "../../../util/blocks";
 import { includes, uuid } from "../../../util/scratch-uuid"
 import { getBlockNumber, getScratchType, getVariable, ScratchType } from "../../../util/scratch-type"
 import { Error } from "../../../util/err";
 import { evaluate } from "../../../util/evaluate";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 function createFunction(data: {
     minArgs: number,
@@ -49,22 +51,22 @@ function createFunction(data: {
 }
 
 module.exports = {
-    volume: createFunction({
-        minArgs: 0,
+    getReturnAddress: createFunction({
+        minArgs: 1,
+        argTypes: ["StringLiteral"],
         doParse: false,
-        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster) => {
-            let key = uuid(includes.scratch_alphanumeric, 16);
+        body: ((parsedArguments: typeData[], callExpression: CallExpression, blockCluster: BlockCluster, pd, bd) => {
+            let jsonFile = JSON.parse(readFileSync(join(__dirname, '../../../assets/fn.json')).toString());
+            let strValue = (callExpression.arguments[0] as StringLiteral).value;
 
-            blockCluster.addBlocks({
-                [key]: createBlock({
-                    opcode: BlockOpCode.SoundVolume,
-                })
-            });
+            if (!jsonFile[strValue]) {
+                new Error("Reference found to non-existant function", bd.originalSource, [ { line: callExpression.loc.start.line, column: callExpression.loc.start.column, length: 1 } ], callExpression.loc.filename).displayError();
+            }
 
             return {
-                isStaticValue: true,
-                blockId: key,
-                block: getBlockNumber(key)
+                block: getVariable(jsonFile[strValue].retCode),
+                blockId: null,
+                isStaticBlock: true
             }
         })
     }),

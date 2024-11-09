@@ -51,7 +51,7 @@ export function createFunction<t = void>(
         if (callExpression.arguments.length < (data as any).minimumArguments) {
             new Error(
                 "Not enough arguments", 
-                buildData.originalSource.substring(callExpression.loc?.start.index || 0, callExpression.loc?.end.index || 0), 
+                buildData.originalSource, 
                 [{ line: callExpression.loc?.start.line || 1, column: callExpression.loc?.start.column || 1, length: (callExpression.loc?.end.column || 1) - (callExpression.loc?.start.column || 1) }], 
                 callExpression.loc?.filename || ""
             );
@@ -60,7 +60,7 @@ export function createFunction<t = void>(
         if (callExpression.arguments.length > (data as any).maximumArguments) {
             new Error(
                 "Too many arguments", 
-                buildData.originalSource.substring(callExpression.loc?.start.index || 0, callExpression.loc?.end.index || 0), 
+                buildData.originalSource, 
                 [{ line: callExpression.loc?.start.line || 1, column: callExpression.loc?.start.column || 1, length: (callExpression.loc?.end.column || 1) - (callExpression.loc?.start.column || 1) }], 
                 callExpression.loc?.filename || ""
             );
@@ -79,7 +79,7 @@ export function createFunction<t = void>(
             } else if (data.argTypes && data.argTypes[i] && data.argTypes[i] != type) {
                 new Error(
                     `Expected '${data.argTypes[i]}' for argument '${i + 1}', got: '${type}'`, 
-                    buildData.originalSource.substring(callExpression.loc?.start.index || 0, callExpression.loc?.end.index || 0), 
+                    buildData.originalSource, 
                     [{ line: callExpression.loc?.start.line || 1, column: callExpression.loc?.start.column || 1, length: (callExpression.loc?.end.column || 1) - (callExpression.loc?.start.column || 1) }],
                     callExpression.loc?.filename || ""
                 );

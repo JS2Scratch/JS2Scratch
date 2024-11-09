@@ -63,7 +63,7 @@ function createProjectContents(name: string, in_folder: string) {
                 currentCostume: 0,
 
                 globalVariables: [],
-                globalLists: [],
+                globalLists: {},
             })),
 
             new DirectoryBuffer("sound").Append([
@@ -165,7 +165,7 @@ function validatePropSchema(objects: any, basePath: string, name: string, type: 
         }
 
         objects.forEach(obj => {
-            if (typeof obj !== 'object' || !obj.name || !obj.file) {
+            if (typeof obj !== 'object' || !('name' in obj) || !('file' in obj)) {
                 throw new Error(`${name}: each object must have a "name" and "file" property.`);
             }
 
@@ -429,6 +429,9 @@ export async function buildProject(argv: {[key: string]: any}, at: string, name:
 
     let broadcastJson = join(__dirname, "../assets/broadcasts.json");
     writeFileSync(broadcastJson, "[]");
+
+    let fnJson = join(__dirname, "../assets/fn.json");
+    writeFileSync(fnJson, "{}");
 
     let classJson = join(__dirname, "../assets/classData.json");
     writeFileSync(classJson, "{}");

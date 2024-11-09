@@ -45,11 +45,11 @@ export class Error {
 
             console.error(` ${chalk.blueBright(`${chalk.blue("-->")} ${this.filePath}:${chalk.blue(position.line)}:${chalk.blue((position.column))}`)}`);
             console.error(`${" ".repeat(msg.length + 1)}${chalk.blue("│")}`);
+
             console.error(`${chalk.bold(chalk.blue(msg))} ${chalk.blue("│")} ${errorLine}`);
 
             let arrowLine = ' '.repeat(Math.max(1, (position.displayColumn || position.column) - 1)) + chalk.red('╭') + chalk.red('─').repeat(position.length - 1) + chalk.red('^');
             console.error(`${" ".repeat(msg.length + 1)}${chalk.blue("│")} ${arrowLine}`);
-
             if (this.positions.length > 1 && index < this.positions.length - 1) {
                 console.error(`${" ".repeat(msg.length + 1)}${chalk.blue("│")}`);
                 console.error(`${" ".repeat(msg.length + 1)}${chalk.blue("│")}`);

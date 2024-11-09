@@ -408,6 +408,8 @@ method.destroy(class: string, instance: string);
 method.get(class: string, instance: string, property: string); // Gets a property of an instance
 method.instancesOf(class: string); // How many instances of a class currently exist
 
+util.getReturnAddress(functionName: string); // Returns a reference to the return address of a function
+
 pen.clear();
 pen.stamp();
 pen.down();
@@ -471,6 +473,115 @@ This function will have a name of `foo`, and will "run without screen refresh".
 
 > [!CAUTION]
 > Passing too many arguments, or too little, will cause the function to not run at all. The correct amount of arguments, if any, must be passed.
+
+Functions can also be asynchronous by using the `async` keyword. In an asynchronous context, you can also call `await` to other asynchronous functions, however async arrow functions are not valid:
+
+```js
+async function myTest() {
+    x = 5
+    looks.sayForSeconds("`myTest` is yielding!", 2)
+}
+
+// `x` will first be set to 5. Then, 6 seconds later,
+// it will be set to 10.
+async function doCode() {
+    // Wait for `myTest` to finish
+    await myTest()
+    looks.sayForSeconds("`MyTest` has finished yielding!", 2)
+    control.wait(2)
+    x = 10
+}
+
+// Call asynchronous function `doCode`
+doCode()
+
+// This code will run instantly,
+// as `doCode` is an asynchronous 
+// function.
+looks.say("Hello!");
+```
+
+It is also possible to return certain values in syncronous and asyncronous contexts. As scratch cannot return values via functions natively, you must `util.getReturnAddress` to get the returned value:
+
+```js
+function getPi() {
+    return 3.141;
+}
+
+// First call the function 
+getPi();
+let x = util.getReturnAddress("getPi"); // We can now access the value via function
+```
+
+Although it is a messy approach, it is the best way internally to handle returning until it is supported. As mentioned, you can also return values via asyncronous functions:
+
+```js
+async function getPiAsync() {
+    control.wait(5);
+    return 3.141;
+}
+
+async function program() {
+    let valueOfPi = 0;
+    getPiAsync();
+
+    valueOfPi = util.getReturnAddress("getPiAsync");
+}
+
+program();
+```
+
+Here is a more complex example using `return`:
+
+```js
+// We don't yield here, so
+// we keep this as a syncronous
+// function.
+function pi() {
+    return 3.14149;
+}
+
+// Once again, there is no yielding here,
+// so this is kept as a syncronous function.
+function getPi() {
+    pi();
+    return util.getReturnAddress("pi"); // Return the content of "pi"
+}
+
+// Note that this function
+// doesn't need to be asyncronous, but is
+// for this example.
+async function program() {
+    let x = 0; // Reset X
+    getPi();
+
+    x = util.getReturnAddress("getPi"); // Set x to the content of "getPi"
+}
+
+// Run the asyncronous function
+// `program`. Note that this function
+// doesn't need to be asyncronous, but is
+// for this example.
+program();
+```
+
+> [!CAUTION]
+> There is no implementation for promises, and therefore making one function `await` another asyncronous function causes the code to wait in an infinite loop. Only make functions that return asyncronous if they actually yield the thread. For example:
+> ```js
+> async function pi() {
+>   return 3.141
+> }
+>
+> async function program() {
+>   await pi(); // This will cause an infinite loop, as by the time
+>               // `pi` has returned, it starts waiting for the function
+>               // to end (which will never happen, as it has already ended).
+>
+>               // If the `pi` function yielded / was syncronous, this would
+>               // work fine.
+> }
+> ```
+
 
 # Classes & Inheritance
 

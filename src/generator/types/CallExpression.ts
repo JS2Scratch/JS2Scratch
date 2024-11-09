@@ -10,13 +10,14 @@
 *
 /******************************************************************/
 
-import { CallExpression } from "@babel/types";
+import { CallExpression, Identifier } from "@babel/types";
 import { BlockCluster } from "../../util/blocks";
 import { buildData } from "../../util/types";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { Warn } from "../../util/err";
 import { join } from "path";
 import { includes, uuid } from "../../util/scratch-uuid";
+import { getScratchType, getVariable, ScratchType } from "../../util/scratch-type";
 
 module.exports = ((BlockCluster: BlockCluster, CallExpression: CallExpression, p_: string, buildData: buildData) => {
     let callee = (CallExpression as any).callee;
@@ -55,5 +56,8 @@ module.exports = ((BlockCluster: BlockCluster, CallExpression: CallExpression, p
         let ID = uuid(includes.scratch_alphanumeric, 16);
 
         return requiredFn(CallExpression, BlockCluster, ID, buildData);
-    }
+    } 
+
+    Warn("Cannot get the value of a function! Use `util.getReturnAddress` instead.");
+    return { err: true };
 })

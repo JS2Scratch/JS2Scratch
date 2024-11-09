@@ -362,6 +362,9 @@ export interface buildData {
     instruction: number,
     originalSource: string,
     packages: {[key: string]: any},
+    isAsync?: boolean,
+    isFunction?: boolean,
+    functionName?: string,
 }
 
 export interface generatedData {

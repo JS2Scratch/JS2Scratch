@@ -37,7 +37,7 @@ export function evaluate(type: string, blockCluster: BlockCluster, instance: any
     } else if (!s)
     {
         data = require(join(__dirname, path));
-    }
+    };
 
     return data(blockCluster, instance, id, buildData)
 }

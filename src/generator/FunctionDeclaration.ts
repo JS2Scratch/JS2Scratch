@@ -11,13 +11,15 @@
 /******************************************************************/
 
 import { BlockCluster, createBlock, createMutation } from "../util/blocks";
-import { FunctionDeclaration } from "@babel/types"
+import { FunctionDeclaration, identifier, numericLiteral, variableDeclaration, variableDeclarator } from "@babel/types"
 import { Block, BlockOpCode, buildData, typeData } from "../util/types";
 import { getBlockNumber, getScratchType, ScratchType } from "../util/scratch-type";
 import { uuid, includes } from "../util/scratch-uuid"
 import { evaluate } from "../util/evaluate";
 import { createGlobal } from "../util/lib-convert";
 import { parseProgram } from "../env/parseProgram";
+import { readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 
 module.exports = ((BlockCluster: BlockCluster, FunctionDeclaration: FunctionDeclaration, buildData: buildData) => {
 
@@ -25,6 +27,35 @@ module.exports = ((BlockCluster: BlockCluster, FunctionDeclaration: FunctionDecl
         uuid(includes.scratch_alphanumeric, 16),
         uuid(includes.scratch_alphanumeric, 16) // proto
     ];
+
+    let hasReturn = false;
+    let fnBody = FunctionDeclaration.body.body;
+    for (let i = 0; i < fnBody.length; i++) {
+        let item = fnBody[i];
+        if (item.type == "ReturnStatement") {
+            hasReturn = true;
+            break;
+        }
+    }
+
+    let path = join(__dirname, '../assets/fn.json');
+    let endCode = uuid(includes.scratch_alphanumeric, 5);
+
+    let object = {
+        async: FunctionDeclaration.async,
+        endCode,
+    };
+
+    if (hasReturn) {
+        let retCode = uuid(includes.scratch_alphanumeric, 5);
+        object["retCode"] = retCode;
+    }
+
+    let readJson = JSON.parse(readFileSync(path).toString());
+    let originalName = (FunctionDeclaration as any).id.name + ""; // Copy
+    readJson[originalName] = object;
+
+    writeFileSync(path, JSON.stringify(readJson))
 
     let inputCodes: string[] = [];
     let innerCodes: string[] = [];
@@ -96,8 +127,18 @@ module.exports = ((BlockCluster: BlockCluster, FunctionDeclaration: FunctionDecl
     blockIds += "]";
     argNames += "]";
 
-    
-    let body = parseProgram(FunctionDeclaration.body, FunctionDeclaration.loc?.filename || "", false, nbd.packages);
+    if (FunctionDeclaration.async) {
+        FunctionDeclaration.body.body.push( variableDeclaration("let", [ variableDeclarator( identifier(endCode), numericLiteral(1) ) ]) );
+    }
+
+    if (FunctionDeclaration.async && hasReturn) {
+        FunctionDeclaration.body.body.unshift( variableDeclaration("let", [ variableDeclarator( identifier(endCode), numericLiteral(0) ) ]) );
+    }
+
+    let body = parseProgram(FunctionDeclaration.body, FunctionDeclaration.loc?.filename || "", false, nbd.packages, {
+        isFunction: true,
+        functionName: originalName
+    });
 
     BlockCluster.addBlocks({
         [IDs[0]]: createBlock({
